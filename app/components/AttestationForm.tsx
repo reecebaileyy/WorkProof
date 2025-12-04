@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from "react";
 import {
   Transaction,
@@ -10,7 +12,9 @@ import {
   TransactionToastLabel,
   TransactionToastAction,
 } from "@coinbase/onchainkit/transaction";
+import type { TransactionProps } from "@coinbase/onchainkit/transaction";
 import { baseSepolia } from "wagmi/chains";
+import type { Abi } from "viem";
 
 const CONTRACT_ADDRESS = "0x63B5546bc67d926992688D1B8277524C444660Fc";
 const CONTRACT_ABI = [
@@ -30,10 +34,11 @@ export function AttestationForm() {
   const [recipient, setRecipient] = useState("");
   const [metadataURI, setMetadataURI] = useState("");
 
-  const calls = [
+  const calls: TransactionProps["calls"] = [
     {
       address: CONTRACT_ADDRESS,
-      abi: CONTRACT_ABI,
+      // CONTRACT_ABI is a const typed ABI; narrow to any for the library call if necessary
+      abi: CONTRACT_ABI as Abi,
       functionName: "issueAttestation",
       args: [recipient as `0x${string}`, metadataURI],
     },
@@ -94,7 +99,7 @@ export function AttestationForm() {
 
         <Transaction
           chainId={baseSepolia.id}
-          calls={calls as any}
+          calls={calls}
           onStatus={(status) => console.log(status)}
         >
           <TransactionButton

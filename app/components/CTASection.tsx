@@ -20,7 +20,7 @@ export function CTASection() {
 
         <div className="flex flex-col sm:flex-row gap-6 justify-center">
           <button className="group relative px-12 py-6 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl font-bold text-xl overflow-hidden transition-all hover:scale-105 hover:shadow-2xl hover:shadow-blue-500/50">
-            <span className="relative z-10">Start Now - It's Free</span>
+            <span className="relative z-10">Start Now - It&apos;s Free</span>
             <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
           </button>
 
