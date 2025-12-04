@@ -1,0 +1,20 @@
+[
+  {
+    "network": "base-sepolia",
+    "timestamp": "2025-12-04T22:08:11.838Z",
+    "owner": "0x41b1e204e9c15fF5894bd47C6Dc3a7Fa98C775C7",
+    "contracts": [
+      {
+        "name": "Credibles",
+        "address": "0x725b47c5fcd4f9dc0d2819ba2682b957499adfa8",
+        "txHash": "0x62bbae9556e6ae9a4a96297318a5e3ccb384bfd44eaae49b20133bb1340d8abe"
+      },
+      {
+        "name": "AttestationResolver",
+        "address": "0x307502170787e06efa90fd751c4c625ab5932956",
+        "txHash": "0x8ab22553ce2b1b14a4738740fe055835de15c48a39dfd3d13b8e3255fedcac91"
+      }
+    ],
+    "schemaUID": "0x33b404644850244e8b14591c6e561039dfafbf5028fb14daa714361dcb0f9104"
+  }
+]
