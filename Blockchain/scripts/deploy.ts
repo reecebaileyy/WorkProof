@@ -1,7 +1,6 @@
-import { createWalletClient, createPublicClient, http } from "../node_modules/viem/_types/index.js";
-import { waitForTransactionReceipt } from "../node_modules/viem/_types/actions/index.js";
-import { privateKeyToAccount } from "../node_modules/viem/_types/accounts/index.js";
-import { baseSepolia } from "../node_modules/viem/_types/chains/index.js";
+import { createWalletClient, createPublicClient, http } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { baseSepolia } from "viem/chains";
 import * as dotenv from "dotenv";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { execSync } from "child_process";
@@ -49,7 +48,7 @@ async function main() {
   console.log(`Credibles deployment transaction: ${crediblesHash}`);
   
   // Wait for transaction receipt
-  const crediblesReceipt = await waitForTransactionReceipt(publicClient, { hash: crediblesHash });
+  const crediblesReceipt = await publicClient.waitForTransactionReceipt({ hash: crediblesHash });
   const crediblesAddress = crediblesReceipt.contractAddress;
   
   if (!crediblesAddress) {
@@ -72,7 +71,7 @@ async function main() {
 
   console.log(`AttestationResolver deployment transaction: ${resolverHash}`);
   
-  const resolverReceipt = await waitForTransactionReceipt(publicClient, { hash: resolverHash });
+  const resolverReceipt = await publicClient.waitForTransactionReceipt({ hash: resolverHash });
   const resolverAddress = resolverReceipt.contractAddress;
   
   if (!resolverAddress) {
@@ -113,7 +112,7 @@ async function main() {
     args: [resolverAddress],
   });
 
-  await waitForTransactionReceipt(publicClient, { hash: setResolverHash });
+  await publicClient.waitForTransactionReceipt({ hash: setResolverHash });
   console.log("AttestationResolver set in Credibles contract");
 
   // Save deployment to history

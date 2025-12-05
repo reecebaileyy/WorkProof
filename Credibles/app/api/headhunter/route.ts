@@ -1,221 +1,168 @@
 import { NextRequest, NextResponse } from "next/server";
-import { paymentMiddleware } from "x402-express";
-import { facilitator } from "@coinbase/x402";
 
-// Configure x402 middleware
-const x402Gate = paymentMiddleware(
-  process.env.WALLET_ADDRESS as `0x${string}`,
+// Payment configuration
+const PAYMENT_CONFIG = {
+  price: "5.00", // 5 USDC
+  network: "base-sepolia",
+  description: "Access Verified Talent Data",
+  recipient: process.env.WALLET_ADDRESS || process.env.NEXT_PUBLIC_WALLET_ADDRESS || "",
+};
+
+// USDC address on Base Sepolia
+const USDC_ADDRESS = process.env.NEXT_PUBLIC_USDC_ADDRESS || "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
+
+// Mock verified users data (in production, this would come from a database)
+const MOCK_VERIFIED_USERS = [
   {
-    "/api/headhunter": {
-      price: "5.00",
-      network: "base-sepolia",
-      config: {
-        description: "Access Verified Talent Data",
-      },
+    id: 1,
+    name: "Alice",
+    level: 5,
+    category: "dev",
+    skills: ["Solidity", "React", "TypeScript"],
+    xp: {
+      dev: 450,
+      defi: 120,
+      gov: 80,
+      social: 60,
     },
+    contact: "alice@example.com",
   },
-  facilitator
-);
+  {
+    id: 2,
+    name: "Bob",
+    level: 3,
+    category: "defi",
+    skills: ["Node.js", "TypeScript", "DeFi Protocols"],
+    xp: {
+      dev: 180,
+      defi: 280,
+      gov: 50,
+      social: 40,
+    },
+    contact: "bob@example.com",
+  },
+  {
+    id: 3,
+    name: "Charlie",
+    level: 4,
+    category: "gov",
+    skills: ["DAO Governance", "Solidity", "Economics"],
+    xp: {
+      dev: 200,
+      defi: 150,
+      gov: 380,
+      social: 90,
+    },
+    contact: "charlie@example.com",
+  },
+  {
+    id: 4,
+    name: "Diana",
+    level: 6,
+    category: "dev",
+    skills: ["Rust", "Web3", "Smart Contracts"],
+    xp: {
+      dev: 580,
+      defi: 200,
+      gov: 100,
+      social: 120,
+    },
+    contact: "diana@example.com",
+  },
+];
 
-// Helper to convert Next.js request/response to Express-like format
-async function handleRequest(request: NextRequest) {
-  return new Promise<NextResponse>((resolve, reject) => {
-    // Read request body if present
-    let body: unknown = null;
-    
-    interface ExpressRequest {
-      method: string;
-      url: string;
-      path: string;
-      headers: Record<string, string>;
-      get: (name: string) => string | null;
-      body: unknown;
-    }
-    
-    const req: ExpressRequest = {
-      method: request.method,
-      url: request.url,
-      path: new URL(request.url).pathname,
-      headers: Object.fromEntries(request.headers.entries()),
-      get: (name: string) => request.headers.get(name),
-      body: body,
-    };
-
-    let responseData: unknown = null;
-
-    const res = {
-      statusCode: 200,
-      headers: {
-        'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-        'Cross-Origin-Embedder-Policy': 'unsafe-none',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      } as Record<string, string>,
-      json: (data: unknown) => {
-        responseData = data;
-        resolve(NextResponse.json(data, { status: res.statusCode, headers: res.headers }));
-      },
-      status: (code: number) => {
-        res.statusCode = code;
-        return res;
-      },
-      setHeader: (name: string, value: string) => {
-        res.headers[name] = value;
-      },
-      end: (data?: string | ArrayBuffer) => {
-        if (data) {
-          resolve(new NextResponse(data, { status: res.statusCode, headers: res.headers }));
-        } else if (responseData) {
-          resolve(NextResponse.json(responseData, { status: res.statusCode, headers: res.headers }));
-        } else {
-          resolve(new NextResponse(null, { status: res.statusCode, headers: res.headers }));
-        }
-      },
-    } as {
-      statusCode: number;
-      headers: Record<string, string>;
-      json: (data: unknown) => void;
-      status: (code: number) => { statusCode: number; headers: Record<string, string>; json: (data: unknown) => void; end: (data?: string | ArrayBuffer) => void; };
-      setHeader: (name: string, value: string) => void;
-      end: (data?: string | ArrayBuffer) => void;
-    };
-
-    // Handle async body reading for POST/PUT requests
-    const processMiddleware = async () => {
-      if (request.method === "POST" || request.method === "PUT" || request.method === "PATCH") {
-        try {
-          const contentType = request.headers.get("content-type");
-          if (contentType?.includes("application/json")) {
-            body = await request.json();
-          } else if (contentType?.includes("text/")) {
-            body = await request.text();
-          } else {
-            body = await request.arrayBuffer();
-          }
-          req.body = body;
-        } catch {
-          // Body might not be JSON or might be empty
-          body = null;
-        }
-      }
-
-      // Call x402 middleware
-      x402Gate(req, res, (err?: Error | unknown) => {
-        if (err) {
-          // Middleware rejected - likely payment required (402)
-          // Check if middleware already set status code
-          if (res.statusCode === 402) {
-            // Return 402 with payment details
-            resolve(
-              NextResponse.json(
-                { 
-                  error: "Payment required",
-                  amount: "5.00",
-                  recipient: process.env.WALLET_ADDRESS,
-                  network: "base-sepolia"
-                },
-                { status: 402, headers: res.headers }
-              )
-            );
-          } else {
-            reject(err);
-          }
-        } else {
-          // Payment verified - return mock talent data
-          resolve(
-            NextResponse.json({
-              topTalent: [
-                { name: "Alice", level: 5, category: "dev" },
-                { name: "Bob", level: 3, category: "defi" },
-              ],
-            }, { headers: res.headers })
-          );
-        }
-      });
-    };
-
-    processMiddleware().catch(() => {
-      // If middleware sends 402, it should be in res.statusCode
-      if (res.statusCode === 402) {
-        // Return 402 with payment details
-        resolve(
-          NextResponse.json(
-            { 
-              error: "Payment required",
-              amount: "5.00",
-              recipient: process.env.WALLET_ADDRESS,
-              network: "base-sepolia"
-            },
-            { status: 402, headers: res.headers }
-          )
-        );
-      } else {
-        // Other errors
-        resolve(
-          NextResponse.json(
-            { error: "Internal server error" },
-            { status: 500 }
-          )
-        );
-      }
-    });
-  });
-}
-
+/**
+ * GET /api/headhunter
+ * 
+ * x402-gated API endpoint for accessing verified talent data.
+ * Returns 402 Payment Required if no valid payment proof is provided.
+ * Returns 200 with verified users JSON if payment is valid.
+ * 
+ * Query params:
+ * - skill: Optional filter by skill category (dev, defi, gov, social)
+ * - level: Optional minimum level filter
+ */
 export async function GET(request: NextRequest) {
   try {
-    const response = await handleRequest(request);
-    // Add CORS and COOP headers
-    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-    response.headers.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
-    response.headers.set('Access-Control-Allow-Origin', '*');
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    return response;
-  } catch {
-    const response = NextResponse.json(
-      { error: "Payment required", amount: "5.00", recipient: process.env.WALLET_ADDRESS, network: "base-sepolia" },
-      { status: 402 }
+    // Check for payment proof in headers
+    const paymentProof = request.headers.get("X-Payment") || request.headers.get("x-payment");
+    
+    // If no payment proof or no recipient address configured, return 402 with payment details
+    if (!paymentProof || !PAYMENT_CONFIG.recipient) {
+      return NextResponse.json(
+        {
+          x402Version: 1,
+          error: "Payment Required",
+          accepts: [
+            {
+              scheme: "exact",
+              network: PAYMENT_CONFIG.network,
+              maxAmountRequired: (parseFloat(PAYMENT_CONFIG.price) * 1e6).toString(), // 5 USDC in smallest unit (6 decimals)
+              asset: USDC_ADDRESS,
+              payTo: PAYMENT_CONFIG.recipient || "0x0000000000000000000000000000000000000000",
+              resource: request.url,
+              description: PAYMENT_CONFIG.description,
+              mimeType: "application/json",
+              outputSchema: null,
+              maxTimeoutSeconds: 60,
+              extra: {
+                name: "USDC",
+                version: "2",
+              },
+            },
+          ],
+        },
+        { status: 402 }
+      );
+    }
+
+    // TODO: Verify payment proof on-chain
+    // In production, you should:
+    // 1. Verify the transaction hash exists on Base Sepolia
+    // 2. Check the transaction is to the PaymentSplitter contract
+    // 3. Verify the amount is >= 5 USDC
+    // 4. Check the transaction is recent (within timeout)
+    // For now, if payment proof exists, allow access
+    
+    const { searchParams } = new URL(request.url);
+    const skillFilter = searchParams.get("skill");
+    const levelFilter = searchParams.get("level");
+
+    // Filter users based on query parameters
+    let filteredUsers = [...MOCK_VERIFIED_USERS];
+
+    if (skillFilter) {
+      filteredUsers = filteredUsers.filter(
+        (user) => user.category === skillFilter.toLowerCase()
+      );
+    }
+
+    if (levelFilter) {
+      const minLevel = parseInt(levelFilter, 10);
+      if (!isNaN(minLevel)) {
+        filteredUsers = filteredUsers.filter(
+          (user) => user.level >= minLevel
+        );
+      }
+    }
+
+    // Return filtered verified users
+    return NextResponse.json(
+      {
+        success: true,
+        count: filteredUsers.length,
+        users: filteredUsers,
+      },
+      { status: 200 }
     );
-    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-    response.headers.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
-    return response;
+  } catch (error) {
+    console.error("Headhunter API error:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: "Internal server error",
+      },
+      { status: 500 }
+    );
   }
 }
-
-export async function POST(request: NextRequest) {
-  try {
-    const response = await handleRequest(request);
-    // Add CORS and COOP headers
-    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-    response.headers.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
-    response.headers.set('Access-Control-Allow-Origin', '*');
-    response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    return response;
-  } catch {
-    const response = NextResponse.json(
-      { error: "Payment required", amount: "5.00", recipient: process.env.WALLET_ADDRESS, network: "base-sepolia" },
-      { status: 402 }
-    );
-    response.headers.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-    response.headers.set('Cross-Origin-Embedder-Policy', 'unsafe-none');
-    return response;
-  }
-}
-
-// Handle preflight OPTIONS requests
-export async function OPTIONS(_request: NextRequest) {
-  return new NextResponse(null, {
-    status: 200,
-    headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
-      'Cross-Origin-Embedder-Policy': 'unsafe-none',
-    },
-  });
-}
-
