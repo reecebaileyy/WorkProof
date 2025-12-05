@@ -128,29 +128,39 @@ export default function SkillPetMint({
     setError(null);
 
     try {
+      console.log('Attempting to create/get resume wallet...');
+      
       // First try to get existing wallet
       let wallet = await getResumeWallet();
+      console.log('Get resume wallet result:', wallet);
 
       // If no existing wallet, create a new one
       if (!wallet) {
+        console.log('No existing wallet found, creating new one...');
         wallet = await createResumeWallet();
+        console.log('Create resume wallet result:', wallet);
       }
 
       if (wallet) {
+        console.log('Setting resume wallet:', wallet);
         setResumeWallet(wallet);
         // Only register if not already registered
         if (
           !registeredWallet ||
           registeredWallet === "0x0000000000000000000000000000000000000000"
         ) {
+          console.log('Registering wallet on-chain...');
           await registerResumeWallet(wallet);
         }
       } else {
-        setError("Failed to create resume wallet");
+        const errorMsg = "Failed to create resume wallet. Please check the browser console for more details and ensure you're connected to Base Sepolia.";
+        console.error(errorMsg);
+        setError(errorMsg);
       }
     } catch (err: unknown) {
+      console.error('Error in createWallet:', err);
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to create resume wallet";
+        err instanceof Error ? err.message : "Failed to create resume wallet. Check console for details.";
       setError(errorMessage);
     } finally {
       setIsCreatingWallet(false);
