@@ -21,19 +21,27 @@ const x402Gate = paymentMiddleware(
 async function handleRequest(request: NextRequest) {
   return new Promise<NextResponse>((resolve, reject) => {
     // Read request body if present
-    let body: any = null;
+    let body: unknown = null;
     
-    const req = {
+    interface ExpressRequest {
+      method: string;
+      url: string;
+      path: string;
+      headers: Record<string, string>;
+      get: (name: string) => string | null;
+      body: unknown;
+    }
+    
+    const req: ExpressRequest = {
       method: request.method,
       url: request.url,
       path: new URL(request.url).pathname,
       headers: Object.fromEntries(request.headers.entries()),
       get: (name: string) => request.headers.get(name),
       body: body,
-    } as any;
+    };
 
-    let responseData: any = null;
-    let responseStatus = 200;
+    let responseData: unknown = null;
 
     const res = {
       statusCode: 200,
@@ -44,9 +52,8 @@ async function handleRequest(request: NextRequest) {
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
       } as Record<string, string>,
-      json: (data: any) => {
+      json: (data: unknown) => {
         responseData = data;
-        responseStatus = res.statusCode;
         resolve(NextResponse.json(data, { status: res.statusCode, headers: res.headers }));
       },
       status: (code: number) => {
@@ -56,7 +63,7 @@ async function handleRequest(request: NextRequest) {
       setHeader: (name: string, value: string) => {
         res.headers[name] = value;
       },
-      end: (data?: any) => {
+      end: (data?: string | ArrayBuffer) => {
         if (data) {
           resolve(new NextResponse(data, { status: res.statusCode, headers: res.headers }));
         } else if (responseData) {
@@ -65,7 +72,14 @@ async function handleRequest(request: NextRequest) {
           resolve(new NextResponse(null, { status: res.statusCode, headers: res.headers }));
         }
       },
-    } as any;
+    } as {
+      statusCode: number;
+      headers: Record<string, string>;
+      json: (data: unknown) => void;
+      status: (code: number) => { statusCode: number; headers: Record<string, string>; json: (data: unknown) => void; end: (data?: string | ArrayBuffer) => void; };
+      setHeader: (name: string, value: string) => void;
+      end: (data?: string | ArrayBuffer) => void;
+    };
 
     // Handle async body reading for POST/PUT requests
     const processMiddleware = async () => {
@@ -80,14 +94,14 @@ async function handleRequest(request: NextRequest) {
             body = await request.arrayBuffer();
           }
           req.body = body;
-        } catch (e) {
+        } catch {
           // Body might not be JSON or might be empty
           body = null;
         }
       }
 
       // Call x402 middleware
-      x402Gate(req, res, (err?: any) => {
+      x402Gate(req, res, (err?: Error | unknown) => {
         if (err) {
           // Middleware rejected - likely payment required (402)
           // Check if middleware already set status code
@@ -121,7 +135,7 @@ async function handleRequest(request: NextRequest) {
       });
     };
 
-    processMiddleware().catch((err) => {
+    processMiddleware().catch(() => {
       // If middleware sends 402, it should be in res.statusCode
       if (res.statusCode === 402) {
         // Return 402 with payment details
@@ -159,7 +173,7 @@ export async function GET(request: NextRequest) {
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     return response;
-  } catch (error) {
+  } catch {
     const response = NextResponse.json(
       { error: "Payment required", amount: "5.00", recipient: process.env.WALLET_ADDRESS, network: "base-sepolia" },
       { status: 402 }
@@ -180,7 +194,7 @@ export async function POST(request: NextRequest) {
     response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     return response;
-  } catch (error) {
+  } catch {
     const response = NextResponse.json(
       { error: "Payment required", amount: "5.00", recipient: process.env.WALLET_ADDRESS, network: "base-sepolia" },
       { status: 402 }
@@ -192,7 +206,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Handle preflight OPTIONS requests
-export async function OPTIONS(request: NextRequest) {
+export async function OPTIONS(_request: NextRequest) {
   return new NextResponse(null, {
     status: 200,
     headers: {

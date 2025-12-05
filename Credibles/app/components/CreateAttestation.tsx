@@ -74,8 +74,9 @@ export default function CreateAttestation({ contractAddress }: CreateAttestation
         functionName: "createAttestationNFT",
         args: [recipient as `0x${string}`, category, title, issuerInfo || ""],
       });
-    } catch (err: any) {
-      setError(err.message || "Failed to create attestation");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to create attestation";
+      setError(errorMessage);
     }
   };
 
@@ -126,7 +127,7 @@ export default function CreateAttestation({ contractAddress }: CreateAttestation
             required
             disabled={isPending || isConfirming}
           />
-          <p className={styles.hint}>Enter the user's resume wallet address</p>
+          <p className={styles.hint}>Enter the user&apos;s resume wallet address</p>
         </div>
 
         <div className={styles.inputGroup}>

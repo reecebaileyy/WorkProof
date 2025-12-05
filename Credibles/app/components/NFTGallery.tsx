@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccount, useReadContract, usePublicClient } from "wagmi";
+import { useAccount, useReadContract } from "wagmi";
 import { parseAbi } from "viem";
 import styles from "./NFTGallery.module.css";
 
@@ -20,7 +20,6 @@ interface NFTGalleryProps {
 
 export default function NFTGallery({ contractAddress }: NFTGalleryProps) {
   const { address, isConnected } = useAccount();
-  const publicClient = usePublicClient();
   const [resumeWallet, setResumeWallet] = useState<`0x${string}` | null>(null);
   const [skillPetTokenId, setSkillPetTokenId] = useState<bigint | null>(null);
   const [attestationTokenIds, setAttestationTokenIds] = useState<bigint[]>([]);

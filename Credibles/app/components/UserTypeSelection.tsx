@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import styles from "./UserTypeSelection.module.css";
 
 interface UserTypeSelectionProps {

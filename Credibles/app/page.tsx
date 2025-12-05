@@ -1,7 +1,7 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Wallet } from "@coinbase/onchainkit/wallet";
-import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, usePublicClient, useChainId, useSwitchChain } from "wagmi";
+import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt, useChainId, useSwitchChain } from "wagmi";
 import { parseAbi } from "viem";
 import { baseSepolia } from "wagmi/chains";
 import styles from "./page.module.css";
@@ -31,7 +31,6 @@ export default function Home() {
   const switchChainHook = useSwitchChain();
   const switchChainAsync = switchChainHook.switchChainAsync;
   const isSwitchingChain = switchChainHook.isPending;
-  const [isAddingChain, setIsAddingChain] = useState(false);
   
   const [userType, setUserType] = useState<UserType>(null);
   const [resumeWallet, setResumeWallet] = useState<`0x${string}` | null>(null);
@@ -42,6 +41,7 @@ export default function Home() {
   const [quizSelectedAnswer, setQuizSelectedAnswer] = useState<number | null>(null);
   const [quizResult, setQuizResult] = useState<"correct" | "incorrect" | null>(null);
   const [xpAdding, setXpAdding] = useState(false);
+  const [copiedAddress, setCopiedAddress] = useState<string | null>(null);
 
   const crediblesV2Address = process.env.NEXT_PUBLIC_CREDIBLES_V2_CONTRACT_ADDRESS as `0x${string}` || 
     process.env.NEXT_PUBLIC_CREDIBLES_CONTRACT_ADDRESS as `0x${string}`;
@@ -89,14 +89,14 @@ export default function Home() {
     },
   });
 
-  const { writeContract: writeContractXP, data: xpHash, isPending: isXPPending } = useWriteContract();
-  const { writeContract: writeContractTrait, data: traitHash, isPending: isTraitPending } = useWriteContract();
+  const { writeContract: writeContractXP, data: xpHash } = useWriteContract();
+  const { writeContract: writeContractTrait, data: traitHash } = useWriteContract();
   
-  const { isLoading: isXPConfirming, isSuccess: isXPSuccess } = useWaitForTransactionReceipt({
+  const { isSuccess: isXPSuccess } = useWaitForTransactionReceipt({
     hash: xpHash,
   });
 
-  const { isLoading: isTraitConfirming, isSuccess: isTraitSuccess } = useWaitForTransactionReceipt({
+  const { isSuccess: isTraitSuccess } = useWaitForTransactionReceipt({
     hash: traitHash,
   });
 
@@ -146,6 +146,17 @@ export default function Home() {
   // Handle SkillPet mint complete
   const handleSkillPetMintComplete = () => {
     setSkillPetMinted(true);
+  };
+
+  // Copy address to clipboard
+  const copyToClipboard = async (address: string) => {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopiedAddress(address);
+      setTimeout(() => setCopiedAddress(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy address:', err);
+    }
   };
 
   // Quiz questions
@@ -283,7 +294,7 @@ export default function Home() {
   };
 
   // Network switching - automatically switch to Base Sepolia when wallet connects
-  const switchToBaseSepolia = async () => {
+  const switchToBaseSepolia = useCallback(async () => {
     if (isSwitchingChain) return;
     
     try {
@@ -293,7 +304,7 @@ export default function Home() {
       // Wagmi v2 usually handles the "add chain" prompt automatically 
       // if the chain is in the config created in Step 1.
     }
-  };
+  }, [isSwitchingChain, switchChainAsync]);
   
   // 2. Ensure the auto-switch useEffect is robust
   useEffect(() => {
@@ -307,23 +318,21 @@ export default function Home() {
     ) {
       switchToBaseSepolia();
     }
-  }, [isConnected, chainId, isSwitchingChain, address]);
+  }, [isConnected, chainId, isSwitchingChain, address, switchToBaseSepolia]);
 
   // Automatically switch to Base Sepolia when wallet connects
   useEffect(() => {
-    if (isConnected && chainId !== baseSepolia.id && !isSwitchingChain && !isAddingChain) {
+    if (isConnected && chainId !== baseSepolia.id && !isSwitchingChain) {
       switchToBaseSepolia();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isConnected, chainId, isSwitchingChain, isAddingChain]);
+  }, [isConnected, chainId, isSwitchingChain, switchToBaseSepolia]);
 
   // Also check chain when user type is selected
   useEffect(() => {
-    if (userType && isConnected && chainId !== baseSepolia.id && !isSwitchingChain && !isAddingChain) {
+    if (userType && isConnected && chainId !== baseSepolia.id && !isSwitchingChain) {
       switchToBaseSepolia();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userType, isConnected, chainId, isSwitchingChain, isAddingChain]);
+  }, [userType, isConnected, chainId, isSwitchingChain, switchToBaseSepolia]);
 
   // Show user type selection if not selected
   if (!userType) {
@@ -362,6 +371,57 @@ export default function Home() {
       </header>
 
       <div className={styles.content}>
+        {/* Wallet Info */}
+        {isConnected && address && (
+          <div className={styles.walletInfo}>
+            <h3>Your Wallets</h3>
+            <div className={styles.walletAddresses}>
+              <div className={styles.addressItem}>
+                <span className={styles.addressLabel}>Main Wallet:</span>
+                <span 
+                  className={styles.addressValue}
+                  onClick={() => copyToClipboard(address)}
+                  style={{ cursor: 'pointer' }}
+                  title="Click to copy full address"
+                >
+                  {address.slice(0, 6)}...{address.slice(-4)}
+                  {copiedAddress === address && <span className={styles.copiedBadge}>✓ Copied!</span>}
+                </span>
+                <a
+                  href={`https://sepolia.basescan.org/address/${address}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.explorerLink}
+                >
+                  View on Explorer
+                </a>
+              </div>
+              {resumeWallet && (
+                <div className={styles.addressItem}>
+                  <span className={styles.addressLabel}>Resume Wallet:</span>
+                  <span 
+                    className={styles.addressValue}
+                    onClick={() => copyToClipboard(resumeWallet)}
+                    style={{ cursor: 'pointer' }}
+                    title="Click to copy full address"
+                  >
+                    {resumeWallet.slice(0, 6)}...{resumeWallet.slice(-4)}
+                    {copiedAddress === resumeWallet && <span className={styles.copiedBadge}>✓ Copied!</span>}
+                  </span>
+                  <a
+                    href={`https://sepolia.basescan.org/address/${resumeWallet}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.explorerLink}
+                  >
+                    View on Explorer
+                  </a>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Network Status */}
             {isConnected && chainId !== baseSepolia.id && (
               <div className={styles.infoText} style={{ 
@@ -486,7 +546,7 @@ export default function Home() {
               )}
                       {quizResult === "incorrect" && quizAttempts >= 3 && (
                         <p className={styles.quizFailure}>
-                          ❌ Incorrect. You've used all 3 attempts. Try again tomorrow!
+                          ❌ Incorrect. You&apos;ve used all 3 attempts. Try again tomorrow!
                         </p>
                       )}
                       {quizResult === "incorrect" && quizAttempts < 3 && (

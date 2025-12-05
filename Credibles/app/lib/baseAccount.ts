@@ -63,16 +63,24 @@ export async function createResumeWallet(): Promise<string | null> {
     
     // Get the current account (universal account)
     const provider = sdk.getProvider();
-    const accounts = await provider.request({ method: 'eth_accounts' });
+    const accounts = await provider.request({ method: 'eth_accounts' }) as string[];
     
     if (accounts.length === 0) {
       throw new Error('No account connected');
     }
 
-    // Create sub-account
+    // Try to get existing sub-account first
+    const existingSubAccount = await sdk.subAccount.get();
+    if (existingSubAccount) {
+      return existingSubAccount.address;
+    }
+
+    // Create sub-account using the connected account
+    // The SDK expects an account parameter that can be an address or account object
     const subAccount = await sdk.subAccount.create({
-      // The SDK will use the connected account as owner
-    });
+      type: 'undeployed',
+      account: accounts[0] as `0x${string}`,
+    } as Parameters<typeof sdk.subAccount.create>[0]);
 
     return subAccount.address;
   } catch (error) {

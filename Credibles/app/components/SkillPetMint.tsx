@@ -95,7 +95,7 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
     if (chainId !== baseSepolia.id && switchChainAsync) {
       try {
         await switchChainAsync({ chainId: baseSepolia.id });
-      } catch (err: any) {
+      } catch {
         setError("Please switch to Base Sepolia network");
         return;
       }
@@ -128,8 +128,9 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
       } else {
         setError("Failed to create resume wallet");
       }
-    } catch (err: any) {
-      setError(err.message || "Failed to create resume wallet");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to create resume wallet";
+      setError(errorMessage);
     } finally {
       setIsCreatingWallet(false);
     }
@@ -154,14 +155,17 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
         functionName: "registerResumeWallet",
         args: [wallet as `0x${string}`],
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Handle "already registered" error gracefully
-      if (err?.message?.includes("already registered") || err?.shortMessage?.includes("already registered")) {
+      const errorMessage = err instanceof Error ? err.message : "";
+      const shortMessage = err && typeof err === "object" && "shortMessage" in err ? String(err.shortMessage) : "";
+      if (errorMessage.includes("already registered") || shortMessage.includes("already registered")) {
         setError(null);
         // The wallet is already registered, so we can proceed
         setResumeWallet(wallet);
       } else {
-        setError(err.message || "Failed to register resume wallet");
+        const finalError = err instanceof Error ? err.message : "Failed to register resume wallet";
+        setError(finalError);
       }
       setIsRegistering(false);
     }
@@ -177,7 +181,7 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
     if (chainId !== baseSepolia.id && switchChainAsync) {
       try {
         await switchChainAsync({ chainId: baseSepolia.id });
-      } catch (err: any) {
+      } catch {
         setError("Please switch to Base Sepolia network");
         return;
       }
@@ -191,8 +195,9 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
         functionName: "mintSkillPet",
         args: [resumeWallet as `0x${string}`],
       });
-    } catch (err: any) {
-      setError(err.message || "Failed to mint SkillPet");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to mint SkillPet";
+      setError(errorMessage);
     }
   };
 

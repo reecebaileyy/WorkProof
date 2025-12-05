@@ -64,9 +64,10 @@ export async function GET(request: NextRequest) {
       pendingDomain: pendingDomain || null,
       status: isVerified ? "verified" : pendingDomain ? "pending" : "not_verified",
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : "Internal server error";
     return NextResponse.json(
-      { error: error.message || "Internal server error" },
+      { error: errorMessage },
       { status: 500 }
     );
   }

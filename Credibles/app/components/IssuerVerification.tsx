@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { parseAbi } from "viem";
-import { baseSepolia } from "wagmi/chains";
 import styles from "./IssuerVerification.module.css";
 
 const CREDIBLES_V2_ABI = parseAbi([
@@ -72,8 +71,9 @@ export default function IssuerVerification({ contractAddress }: IssuerVerificati
         functionName: "requestIssuerVerification",
         args: [domain],
       });
-    } catch (err: any) {
-      setError(err.message || "Failed to submit verification request");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to submit verification request";
+      setError(errorMessage);
       setIsSubmitting(false);
     }
   };
@@ -90,7 +90,7 @@ export default function IssuerVerification({ contractAddress }: IssuerVerificati
     <div className={styles.container}>
       <h2>Issuer Verification</h2>
       <p className={styles.description}>
-        Verify your company or school email to become an issuer. You'll be able to create
+        Verify your company or school email to become an issuer. You&apos;ll be able to create
         attestations and mint NFTs for users.
       </p>
 
@@ -123,7 +123,7 @@ export default function IssuerVerification({ contractAddress }: IssuerVerificati
             <div className={styles.success}>
               <p>✓ Verification request submitted successfully!</p>
               <p className={styles.successNote}>
-                Your request is pending review. You'll be notified once verified.
+                Your request is pending review. You&apos;ll be notified once verified.
               </p>
             </div>
           )}

@@ -55,6 +55,113 @@
   }
 }
 
+.walletInfo {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+@media (prefers-color-scheme: light) {
+  .walletInfo {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.walletInfo h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.walletAddresses {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.addressItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.addressLabel {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  min-width: 120px;
+}
+
+@media (prefers-color-scheme: light) {
+  .addressLabel {
+    color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+.addressValue {
+  font-family: 'Courier New', monospace;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  position: relative;
+  transition: all 0.2s;
+}
+
+.addressValue:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (prefers-color-scheme: light) {
+  .addressValue {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    color: rgba(0, 0, 0, 0.9);
+  }
+  
+  .addressValue:hover {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.25);
+  }
+}
+
+.copiedBadge {
+  margin-left: 0.5rem;
+  color: #10b981;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: light) {
+  .copiedBadge {
+    color: #059669;
+  }
+}
+
+.explorerLink {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: opacity 0.2s;
+}
+
+.explorerLink:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: light) {
+  .explorerLink {
+    color: #2563eb;
+  }
+}
+
 .skillTree,
 .attestations,
 .apiSection {
