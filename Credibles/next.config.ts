@@ -13,7 +13,14 @@ const nextConfig: NextConfig = {
   
   // Exclude blockchain folder from webpack processing
   webpack: (config, { isServer }) => {
-    config.externals.push("pino-pretty", "lokijs", "encoding");
+    config.externals.push(
+      "pino-pretty", 
+      "lokijs", 
+      "encoding",
+      "@react-native-async-storage/async-storage",
+      "react-native",
+      "react-native-fs"
+    );
     
     // Ignore blockchain folder from watching - create new object to avoid read-only error
     const existingIgnored = config.watchOptions?.ignored 
@@ -30,33 +37,42 @@ const nextConfig: NextConfig = {
       ],
     };
     
-    // Fix for MetaMask SDK trying to import React Native modules in web context
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback,
-        "@react-native-async-storage/async-storage": false,
-      };
-      
-      // Ignore React Native modules that MetaMask SDK might try to import
-      config.resolve.alias = {
-        ...config.resolve.alias,
-        "@react-native-async-storage/async-storage": false,
-      };
-      
-      // Ignore specific modules that cause warnings - suppress all MetaMask SDK warnings
-      config.ignoreWarnings = [
-        ...(config.ignoreWarnings || []),
-        // Suppress warnings about React Native modules in MetaMask SDK
-        /@metamask\/sdk/,
-        /@react-native-async-storage\/async-storage/,
-        {
-          module: /@metamask\/sdk/,
-        },
-        {
-          message: /Can't resolve '@react-native-async-storage\/async-storage'/,
-        },
-      ];
-    }
+    // Fix for MetaMask SDK and other packages trying to import React Native modules
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      "@react-native-async-storage/async-storage": false,
+      "react-native": false,
+      "react-native-fs": false,
+    };
+    
+    // Alias React Native modules to false to prevent resolution errors
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@react-native-async-storage/async-storage": false,
+      "react-native": false,
+      "react-native-fs": false,
+    };
+    
+    // Ignore specific modules that cause warnings
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings || []),
+      // Suppress warnings about React Native modules
+      /@metamask\/sdk/,
+      /@react-native-async-storage\/async-storage/,
+      /react-native/,
+      {
+        module: /@metamask\/sdk/,
+      },
+      {
+        module: /@react-native-async-storage\/async-storage/,
+      },
+      {
+        message: /Can't resolve '@react-native-async-storage\/async-storage'/,
+      },
+      {
+        message: /Can't resolve 'react-native'/,
+      },
+    ];
     
     return config;
   },
