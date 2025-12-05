@@ -1,0 +1,54 @@
+[
+  {
+    "network": "base-sepolia",
+    "timestamp": "2025-12-04T22:08:11.838Z",
+    "owner": "0x41b1e204e9c15fF5894bd47C6Dc3a7Fa98C775C7",
+    "contracts": [
+      {
+        "name": "Credibles",
+        "address": "0x725b47c5fcd4f9dc0d2819ba2682b957499adfa8",
+        "txHash": "0x62bbae9556e6ae9a4a96297318a5e3ccb384bfd44eaae49b20133bb1340d8abe"
+      },
+      {
+        "name": "AttestationResolver",
+        "address": "0x307502170787e06efa90fd751c4c625ab5932956",
+        "txHash": "0x8ab22553ce2b1b14a4738740fe055835de15c48a39dfd3d13b8e3255fedcac91"
+      }
+    ],
+    "schemaUID": "0x33b404644850244e8b14591c6e561039dfafbf5028fb14daa714361dcb0f9104"
+  },
+  {
+    "network": "base-sepolia",
+    "timestamp": "2025-12-05T04:26:24.339Z",
+    "owner": "0x41b1e204e9c15fF5894bd47C6Dc3a7Fa98C775C7",
+    "contracts": [
+      {
+        "name": "CrediblesV2",
+        "address": "0x2d5e9e36e964de4523459279e2641b3109f6218a",
+        "txHash": "0x2fdca3e9b5cc3031aa27980730ef67ed7651c28e5fcca5fbffe9089a69bdd395"
+      },
+      {
+        "name": "IssuerRegistry",
+        "address": "0xd645190918991bcc54150d9577fe0c8508765f66",
+        "txHash": "0x86eaa82cc3fe5c7ddaf3761ae8ee0f2933323804f4dfb6be2d86ede434372bc9"
+      }
+    ]
+  },
+  {
+    "network": "base-sepolia",
+    "timestamp": "2025-12-05T04:33:25.360Z",
+    "owner": "0x41b1e204e9c15fF5894bd47C6Dc3a7Fa98C775C7",
+    "contracts": [
+      {
+        "name": "CrediblesV2",
+        "address": "0xdec827ac26b4afa6f5e27dcfbfd5dbd14b1050cf",
+        "txHash": "0x1f1dcad239fda325e13557bd6798e4fd0499e83898cce1d68b40a590e8beae33"
+      },
+      {
+        "name": "IssuerRegistry",
+        "address": "0xedd3dbb90285c876dc553d11a77ab83471c07d2c",
+        "txHash": "0xa749dfdb2be8bc8d08f2c56fc048348e95629998e3c9fba697f919cef8a48261"
+      }
+    ]
+  }
+]

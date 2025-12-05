@@ -1,0 +1,134 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(90deg, #0052ff, #00ff00);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@media (prefers-color-scheme: light) {
+  .subtitle {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  width: 100%;
+}
+
+.optionCard {
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (prefers-color-scheme: light) {
+  .optionCard {
+    background: rgba(0, 0, 0, 0.03);
+    border: 2px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.optionCard:hover {
+  transform: translateY(-4px);
+  border-color: #0052ff;
+  box-shadow: 0 8px 24px rgba(0, 82, 255, 0.2);
+}
+
+.optionCard:active {
+  transform: translateY(-2px);
+}
+
+.icon {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+.optionCard h2 {
+  font-size: 1.75rem;
+  margin: 0;
+  color: white;
+}
+
+@media (prefers-color-scheme: light) {
+  .optionCard h2 {
+    color: #171717;
+  }
+}
+
+.optionCard p {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+}
+
+@media (prefers-color-scheme: light) {
+  .optionCard p {
+    color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+.features {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.features li {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+@media (prefers-color-scheme: light) {
+  .features li {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.features li::before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #00ff00;
+  font-weight: 600;
+}
+
