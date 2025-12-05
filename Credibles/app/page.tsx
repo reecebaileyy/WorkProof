@@ -21,6 +21,7 @@ import NFTGallery from "./components/NFTGallery";
 import LandingPage from "./components/LandingPage";
 import Navbar from "./components/Navbar";
 import { getResumeWallet } from "./lib/baseAccount";
+// FIX: Use the frame-sdk (default import) which supports actions.ready()
 import sdk from '@farcaster/frame-sdk';
 
 
@@ -142,6 +143,22 @@ export default function Home() {
     },
   });
 
+  // -------------------------------------------------------------------------
+  // CRITICAL: SDK Ready Call
+  // -------------------------------------------------------------------------
+  useEffect(() => {
+    // This console log will help you debug if the app is actually loading this far
+    console.log("App mounted, calling sdk.actions.ready()...");
+    
+    if (sdk && sdk.actions) {
+        sdk.actions.ready();
+        console.log("sdk.actions.ready() called!");
+    } else {
+        console.error("SDK not initialized properly");
+    }
+  }, []);
+  // -------------------------------------------------------------------------
+
   // Set resume wallet when registered
   useEffect(() => {
     if (
@@ -178,9 +195,6 @@ export default function Home() {
     }
   }, [hasSkillPet]);
 
-  useEffect(() => {
-    sdk.actions.ready();
-  }, []);
 
   // Handle user type selection
   const handleUserTypeSelect = (type: "user" | "issuer") => {
@@ -431,8 +445,6 @@ export default function Home() {
     if (totalXP < 600) return { stage: "Young Dragon", totalXP };
     return { stage: "Dragon", totalXP };
   };
-
-  const evolution = getEvolutionStatus(skillPetStats);
 
   const calculateLevel = (xp: bigint | undefined) => {
     if (!xp) return 0;
