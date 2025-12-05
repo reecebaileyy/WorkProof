@@ -11,6 +11,9 @@ export const config = createConfig({
   connectors: [
     coinbaseWallet({
       appName: 'Credibles',
+      preference: 'smartWalletOnly', // Force smart wallet which respects chain config
+      version: '4',
+      chainId: baseSepolia.id, // Explicitly set default chain to Base Sepolia
     }),
   ],
   ssr: true,

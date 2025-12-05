@@ -745,6 +745,80 @@ export default function Home() {
                   contractAddress={crediblesV2Address}
                   onMintComplete={handleSkillPetMintComplete}
                 />
+<<<<<<< HEAD
+              </>
+            ) : (
+              <IssuerVerification contractAddress={crediblesV2Address} />
+                )}
+          </>
+        ) : (
+          <>
+            {!skillPetMinted ? (
+              <SkillPetMint 
+                contractAddress={crediblesV2Address} 
+                onMintComplete={handleSkillPetMintComplete}
+              />
+            ) : (
+              <>
+                <NFTGallery 
+                  crediblesV2Address={crediblesV2Address} 
+                  attestationNFTAddress={attestationNFTAddress || "0x0000000000000000000000000000000000000000"}
+                />
+                
+                {/* Skill Tree Section */}
+                {skillPetStats && (() => {
+                  const evolution = getEvolutionStatus(skillPetStats);
+                  return (
+              <section className={styles.skillTree}>
+                <div className={styles.skillTreeHeader}>
+                      <h2>Skill Tree</h2>
+                  <div className={styles.evolutionBadge}>
+                    <span className={styles.evolutionLabel}>Evolution:</span>
+                    <span className={styles.evolutionStage}>{evolution.stage}</span>
+                    <span className={styles.evolutionXP}>({evolution.totalXP} Total XP)</span>
+                  </div>
+                </div>
+                  <div className={styles.skillsGrid}>
+                    {[
+                        { key: "dev", label: "Development", xp: skillPetStats[0] },
+                        { key: "defi", label: "DeFi", xp: skillPetStats[1] },
+                        { key: "gov", label: "Governance", xp: skillPetStats[2] },
+                        { key: "social", label: "Social", xp: skillPetStats[3] },
+                    ].map((skill) => {
+                        const level = calculateLevel(skill.xp);
+                      const progress = calculateProgress(skill.xp);
+                        const xpValue = skill.xp ? Number(skill.xp) : 0;
+                      return (
+                        <div key={skill.key} className={styles.skillCard}>
+                          <div className={styles.skillHeader}>
+                            <h3>{skill.label}</h3>
+                            <span className={styles.level}>Level {level}</span>
+                          </div>
+                          <div className={styles.progressBar}>
+                            <div
+                              className={styles.progressFill}
+                              style={{ width: `${progress * 100}%` }}
+                            />
+                          </div>
+                          <div className={styles.xpInfo}>
+                              <span>{xpValue} XP</span>
+                            <span>{Math.floor(progress * 100)}% to next level</span>
+                          </div>
+                            <button
+                              onClick={() => startDailyTask(skill.key)}
+                              className={styles.dailyTaskButton}
+                              disabled={xpAdding}
+                            >
+                              Complete Daily Task
+                            </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  </section>
+                  );
+                })()}
+=======
               ) : (
                 <>
                   <NFTGallery
@@ -754,6 +828,7 @@ export default function Home() {
                       "0x0000000000000000000000000000000000000000"
                     }
                   />
+>>>>>>> main
 
                   {/* Skill Tree Section */}
                   {skillPetStats && (

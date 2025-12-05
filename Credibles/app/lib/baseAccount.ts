@@ -14,7 +14,8 @@ export function initializeBaseAccountSDK() {
   sdkInstance = createBaseAccountSDK({
     appName: 'Credibles',
     appLogoUrl: '/sphere.svg',
-    appChainIds: [baseSepolia.id],
+    appChainIds: [baseSepolia.id], // Only allow Base Sepolia
+    defaultChainId: baseSepolia.id, // Set default chain explicitly
     subAccounts: {
       creation: 'on-connect', // Auto-create on first connect
       defaultAccount: 'sub', // Use sub-account by default

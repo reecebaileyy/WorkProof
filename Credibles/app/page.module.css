@@ -1,0 +1,877 @@
+.container {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Light mode support */
+@media (prefers-color-scheme: light) {
+  .container {
+    color: #171717;
+  }
+}
+
+.headerWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .headerWrapper {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem 1rem;
+}
+
+.title {
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.connectPrompt {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@media (prefers-color-scheme: light) {
+  .connectPrompt {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.walletInfo {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+@media (prefers-color-scheme: light) {
+  .walletInfo {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.walletInfo h3 {
+  margin: 0 0 1rem 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.walletAddresses {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.addressItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.addressLabel {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  min-width: 120px;
+}
+
+@media (prefers-color-scheme: light) {
+  .addressLabel {
+    color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+.addressValue {
+  font-family: 'Courier New', monospace;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+  position: relative;
+  transition: all 0.2s;
+}
+
+.addressValue:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (prefers-color-scheme: light) {
+  .addressValue {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    color: rgba(0, 0, 0, 0.9);
+  }
+  
+  .addressValue:hover {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.25);
+  }
+}
+
+.copiedBadge {
+  margin-left: 0.5rem;
+  color: #10b981;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: light) {
+  .copiedBadge {
+    color: #059669;
+  }
+}
+
+.explorerLink {
+  color: #3b82f6;
+  text-decoration: none;
+  font-size: 0.875rem;
+  transition: opacity 0.2s;
+}
+
+.explorerLink:hover {
+  opacity: 0.8;
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: light) {
+  .explorerLink {
+    color: #2563eb;
+  }
+}
+
+.skillTree,
+.attestations,
+.apiSection {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .skillTree,
+  .attestations,
+  .apiSection {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.skillTree h2,
+.attestations h2,
+.apiSection h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.skillsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.skillCard {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .skillCard {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.skillHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.skillHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.level {
+  background: rgba(0, 255, 0, 0.2);
+  color: #00ff00;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.progressBar {
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+@media (prefers-color-scheme: light) {
+  .progressBar {
+    background: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff00, #00cc00);
+  transition: width 0.3s ease;
+  border-radius: 6px;
+}
+
+.xpInfo {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@media (prefers-color-scheme: light) {
+  .xpInfo {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.attestationList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.attestationCard {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .attestationCard {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.attestationCard p {
+  margin: 0.5rem 0;
+}
+
+.apiButton {
+  background: linear-gradient(90deg, #0052ff, #0066ff);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-bottom: 1rem;
+}
+
+.apiButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.apiButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.talentList {
+  margin-top: 1rem;
+}
+
+.talentList h3 {
+  margin-bottom: 1rem;
+}
+
+.talentCard {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .talentCard {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.talentCard p {
+  margin: 0;
+}
+
+/* Mint Section */
+.mintSection {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .mintSection {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.mintSection h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.mintCard {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .mintCard {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.mintDescription {
+  margin: 0 0 1.5rem 0;
+  color: rgba(43, 0, 255, 0.8);
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: light) {
+  .mintDescription {
+    color: rgba(0, 50, 200, 0.9);
+  }
+}
+
+.mintControls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.mintInput {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #ffffff;
+  font-size: 1rem;
+  min-width: 120px;
+  transition: all 0.2s;
+}
+
+@media (prefers-color-scheme: light) {
+  .mintInput {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #000000;
+  }
+}
+
+.mintInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+@media (prefers-color-scheme: light) {
+  .mintInput::placeholder {
+    color: rgba(0, 0, 0, 0.5);
+  }
+}
+
+.mintInput:focus {
+  outline: none;
+  border-color: #0052ff;
+  background: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .mintInput:focus {
+    background: rgba(0, 0, 0, 0.08);
+  }
+}
+
+.mintInput:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.mintButton {
+  background: linear-gradient(90deg, #0052ff, #0066ff);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.mintButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.mintButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.errorText {
+  color: #ff4444;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.successText {
+  color: #00ff00;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.infoText {
+  color: #ffaa00;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.explorerLink {
+  color: #0052ff;
+  text-decoration: underline;
+  margin-top: 0.5rem;
+  display: inline-block;
+}
+
+.explorerLink:hover {
+  color: #0066ff;
+}
+
+.balanceText {
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: light) {
+  .balanceText {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+/* NFT Section */
+.nftSection {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .nftSection {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.nftSection h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.nftSelector {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.nftButton {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.nftButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.nftButtonActive {
+  background: linear-gradient(90deg, #0052ff, #0066ff);
+  border-color: #0052ff;
+  font-weight: 600;
+}
+
+@media (prefers-color-scheme: light) {
+  .nftButton {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #171717;
+  }
+  
+  .nftButton:hover {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.3);
+  }
+  
+  .nftButtonActive {
+    color: white;
+  }
+}
+
+/* Skill Tree Header */
+.skillTreeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.skillTreeHeader h2 {
+  margin: 0;
+}
+
+.evolutionBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  flex-wrap: wrap;
+}
+
+.evolutionLabel {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+}
+
+@media (prefers-color-scheme: light) {
+  .evolutionLabel {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.evolutionStage {
+  color: #00ff00;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.evolutionXP {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+}
+
+@media (prefers-color-scheme: light) {
+  .evolutionXP {
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+}
+
+@media (prefers-color-scheme: light) {
+  .subtitle {
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.tokenInputSection {
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tokenInputSection p {
+  margin: 0 0 1rem 0;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+@media (prefers-color-scheme: light) {
+  .tokenInputSection {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+  
+  .tokenInputSection p {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.tokenInputGroup {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* Daily Task Button */
+.dailyTaskButton {
+  background: linear-gradient(90deg, #00cc00, #00ff00);
+  color: #000;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 0.75rem;
+  width: 100%;
+}
+
+.dailyTaskButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.dailyTaskButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modalContent {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modalContent h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.quizQuestion {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.quizOptions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.quizOption {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.quizOption:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.quizOption:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.quizOptionCorrect {
+  background: rgba(0, 255, 0, 0.2) !important;
+  border-color: rgba(0, 255, 0, 0.5) !important;
+  color: #00ff00 !important;
+}
+
+.quizOptionIncorrect {
+  background: rgba(255, 0, 0, 0.2) !important;
+  border-color: rgba(255, 0, 0, 0.5) !important;
+  color: #ff4444 !important;
+}
+
+.quizSuccess {
+  color: #00ff00;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.quizFailure {
+  color: #ff4444;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.quizWarning {
+  color: #ffaa00;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.quizInfo {
+  color: #0052ff;
+  margin-bottom: 1rem;
+}
+
+.modalCloseButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+}
+
+.modalCloseButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.modalCloseButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.backButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+@media (prefers-color-scheme: light) {
+  .backButton {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #171717;
+  }
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+@media (prefers-color-scheme: light) {
+  .backButton:hover {
+    background: rgba(0, 0, 0, 0.08);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .modalOverlay {
+    background: rgba(0, 0, 0, 0.5);
+  }
+  
+  .modalContent {
+    background: rgba(255, 255, 255, 0.98);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #171717;
+  }
+  
+  .quizOption {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #171717;
+  }
+  
+  .quizOption:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.3);
+  }
+  
+  .modalCloseButton {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #171717;
+  }
+  
+  .modalCloseButton:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.08);
+  }
+}
