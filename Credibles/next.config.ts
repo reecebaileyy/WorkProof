@@ -11,18 +11,24 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   
+  // Optimize production build
+  productionBrowserSourceMaps: false,
+  
+  // Disable SWC minification and use Terser as fallback
+  swcMinify: true,
+  
   // Exclude blockchain folder from webpack processing
   webpack: (config, { isServer }) => {
-    config.externals.push(
-      "pino-pretty", 
-      "lokijs", 
-      "encoding",
-      "@react-native-async-storage/async-storage",
-      "react-native",
-      "react-native-fs"
-    );
+    // Add externals
+    if (!config.externals) {
+      config.externals = [];
+    }
     
-    // Ignore blockchain folder from watching - create new object to avoid read-only error
+    if (Array.isArray(config.externals)) {
+      config.externals.push("pino-pretty", "lokijs", "encoding");
+    }
+    
+    // Ignore blockchain folder from watching
     const existingIgnored = config.watchOptions?.ignored 
       ? (Array.isArray(config.watchOptions.ignored) 
           ? config.watchOptions.ignored 
@@ -37,41 +43,32 @@ const nextConfig: NextConfig = {
       ],
     };
     
-    // Fix for MetaMask SDK and other packages trying to import React Native modules
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      "@react-native-async-storage/async-storage": false,
-      "react-native": false,
-      "react-native-fs": false,
-    };
+    // Fix for React Native modules (client-side only)
+    if (!isServer) {
+      config.resolve = config.resolve || {};
+      
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        "@react-native-async-storage/async-storage": false,
+        "react-native": false,
+        "react-native-fs": false,
+        "fs": false,
+        "net": false,
+        "tls": false,
+      };
+      
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        "@react-native-async-storage/async-storage": false,
+        "react-native": false,
+      };
+    }
     
-    // Alias React Native modules to false to prevent resolution errors
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      "@react-native-async-storage/async-storage": false,
-      "react-native": false,
-      "react-native-fs": false,
-    };
-    
-    // Ignore specific modules that cause warnings
+    // Suppress warnings about missing React Native modules
     config.ignoreWarnings = [
       ...(config.ignoreWarnings || []),
-      // Suppress warnings about React Native modules
-      /@metamask\/sdk/,
-      /@react-native-async-storage\/async-storage/,
-      /react-native/,
-      {
-        module: /@metamask\/sdk/,
-      },
-      {
-        module: /@react-native-async-storage\/async-storage/,
-      },
-      {
-        message: /Can't resolve '@react-native-async-storage\/async-storage'/,
-      },
-      {
-        message: /Can't resolve 'react-native'/,
-      },
+      /Can't resolve '@react-native-async-storage\/async-storage'/,
+      /Can't resolve 'react-native'/,
     ];
     
     return config;
