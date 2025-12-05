@@ -20,29 +20,22 @@ function withValidProperties(properties: Record<string, undefined | string | str
         "version": "1",
         "name": "Credibles",
         "homeUrl": "https://work-proof-seven.vercel.app",
-        "iconUrl": "https://ex.co/i.png",
-        "splashImageUrl": "https://ex.co/l.png",
+        "iconUrl": "https://work-proof-seven.vercel.app/sphere.svg",
+        "splashImageUrl": "https://work-proof-seven.vercel.app/sphere.svg",
         "splashBackgroundColor": "#000000",
-        "webhookUrl": "https://ex.co/api/webhook",
-        "subtitle": "Fast, fun, social",
-        "description": "A fast, fun way to challenge friends in real time.",
-        "screenshotUrls": [
-          "https://ex.co/s1.png",
-          "https://ex.co/s2.png",
-          "https://ex.co/s3.png"
-        ],
-        "primaryCategory": "social",
+        "subtitle": "Credential NFT Platform",
+        "description": "Complete tasks to upgrade your SkillPet and mint achievement NFTs on Base",
+        "primaryCategory": "defi",
         "tags": [
-          "learn",
-          "miniapp",
-          "baseapp"
+          "credentials",
+          "nft",
+          "learn"
         ],
-        "heroImageUrl": "https://ex.co/og.png",
-        "tagline": "Learn and Earn",
-        "ogTitle": "Credibles",
-        "ogDescription": "Complete tasks to upgrade your skills pet",
-        "ogImageUrl": "https://ex.co/og.png",
-        "noindex": true
+        "tagline": "Learn and Earn Credentials",
+        "ogTitle": "Credibles - WorkProof",
+        "ogDescription": "Complete tasks to upgrade your SkillPet and earn verifiable credentials",
+        "ogImageUrl": "https://work-proof-seven.vercel.app/sphere.svg",
+        "noindex": false
       }
     });
   }
