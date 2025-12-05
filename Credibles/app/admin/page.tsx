@@ -13,6 +13,8 @@ const CREDIBLES_V2_ABI = parseAbi([
   "function verifyIssuer(address issuer, string memory emailDomain) external",
   "function verifyDomain(string memory emailDomain) external",
   "function setAttestationResolver(address _attestationResolver) external",
+  "function addAdmin(address admin) external",
+  "function removeAdmin(address admin) external",
   "function pendingVerifications(address) view returns (string)",
   "function isVerifiedIssuer(address issuer) view returns (bool)",
   "function attestationResolver() view returns (address)",
@@ -22,7 +24,26 @@ const CREDIBLES_V2_ABI = parseAbi([
 ]);
 
 const ATTESTATION_NFT_ABI = parseAbi([
+  "function owner() view returns (address)",
+  "function admins(address) view returns (bool)",
+  "function setCrediblesV2Contract(address _crediblesV2Contract) external",
+  "function setAttestationResolver(address _attestationResolver) external",
+  "function addAdmin(address admin) external",
+  "function removeAdmin(address admin) external",
+  "function crediblesV2Contract() view returns (address)",
+  "function attestationResolver() view returns (address)",
+  "function nextTokenId() view returns (uint256)",
   "event AttestationNFTMinted(address indexed recipient, address indexed issuer, uint256 indexed tokenId, string category, string title)",
+]);
+
+const ATTESTATION_RESOLVER_ABI = parseAbi([
+  "function owner() view returns (address)",
+  "function admins(address) view returns (bool)",
+  "function setAttestationNFT(address _attestationNFT) external",
+  "function addAdmin(address admin) external",
+  "function removeAdmin(address admin) external",
+  "function attestationNFT() view returns (address)",
+  "function schemaUID() view returns (bytes32)",
 ]);
 
 interface PendingIssuer {
@@ -45,9 +66,11 @@ export default function AdminDashboard() {
   const crediblesV2Address = (process.env.NEXT_PUBLIC_CREDIBLES_V2_CONTRACT_ADDRESS || 
     process.env.NEXT_PUBLIC_CREDIBLES_CONTRACT_ADDRESS) as `0x${string}`;
   const attestationNFTAddress = process.env.NEXT_PUBLIC_ATTESTATION_NFT_CONTRACT_ADDRESS as `0x${string}`;
+  const attestationResolverAddress = (process.env.NEXT_PUBLIC_ATTESTATION_RESOLVER_CONTRACT_ADDRESS || 
+    process.env.NEXT_PUBLIC_ATTESTATION_RESOLVER_ADDRESS) as `0x${string}`;
 
-  // Check if user is owner
-  const { data: ownerAddress, isLoading: isLoadingOwner } = useReadContract({
+  // Check if user is owner on CrediblesV2
+  const { data: crediblesV2Owner, isLoading: isLoadingCrediblesOwner } = useReadContract({
     address: crediblesV2Address,
     abi: CREDIBLES_V2_ABI,
     functionName: "owner",
@@ -56,8 +79,8 @@ export default function AdminDashboard() {
     },
   });
 
-  // Check if user is admin
-  const { data: isAdminAddress, isLoading: isLoadingAdmin } = useReadContract({
+  // Check if user is admin on CrediblesV2
+  const { data: isCrediblesAdminFromContract, isLoading: isLoadingCrediblesAdmin } = useReadContract({
     address: crediblesV2Address,
     abi: CREDIBLES_V2_ABI,
     functionName: "admins",
@@ -67,12 +90,65 @@ export default function AdminDashboard() {
     },
   });
 
-  const isOwner = isConnected && address && ownerAddress && address.toLowerCase() === ownerAddress.toLowerCase();
-  const isAdmin = isOwner || (isConnected && address && isAdminAddress === true);
-  const isLoadingAccess = isLoadingOwner || isLoadingAdmin;
+  // Check if user is owner on AttestationNFT
+  const { data: attestationNFTOwner, isLoading: isLoadingAttestationNFTOwner } = useReadContract({
+    address: attestationNFTAddress,
+    abi: ATTESTATION_NFT_ABI,
+    functionName: "owner",
+    query: {
+      enabled: !!attestationNFTAddress && isConnected,
+    },
+  });
 
-  // Contract state reads
-  const { data: attestationResolver } = useReadContract({
+  // Check if user is admin on AttestationNFT
+  const { data: isAttestationNFTAdminFromContract, isLoading: isLoadingAttestationNFTAdmin } = useReadContract({
+    address: attestationNFTAddress,
+    abi: ATTESTATION_NFT_ABI,
+    functionName: "admins",
+    args: address ? [address] : undefined,
+    query: {
+      enabled: !!attestationNFTAddress && isConnected && !!address,
+    },
+  });
+
+  // Check if user is owner on AttestationResolver
+  const { data: resolverOwner, isLoading: isLoadingResolverOwner } = useReadContract({
+    address: attestationResolverAddress,
+    abi: ATTESTATION_RESOLVER_ABI,
+    functionName: "owner",
+    query: {
+      enabled: !!attestationResolverAddress && isConnected,
+    },
+  });
+
+  // Check if user is admin on AttestationResolver
+  const { data: isResolverAdminFromContract, isLoading: isLoadingResolverAdmin } = useReadContract({
+    address: attestationResolverAddress,
+    abi: ATTESTATION_RESOLVER_ABI,
+    functionName: "admins",
+    args: address ? [address] : undefined,
+    query: {
+      enabled: !!attestationResolverAddress && isConnected && !!address,
+    },
+  });
+
+  // User is admin if they are owner or admin on ANY of the contracts
+  const isCrediblesOwner = isConnected && address && crediblesV2Owner && address.toLowerCase() === crediblesV2Owner.toLowerCase();
+  const isCrediblesAdmin = isCrediblesOwner || (isConnected && address && isCrediblesAdminFromContract === true);
+  
+  const isAttestationNFTOwner = isConnected && address && attestationNFTOwner && address.toLowerCase() === attestationNFTOwner.toLowerCase();
+  const isAttestationNFTAdmin = isAttestationNFTOwner || (isConnected && address && isAttestationNFTAdminFromContract === true);
+  
+  const isResolverOwner = isConnected && address && resolverOwner && address.toLowerCase() === resolverOwner.toLowerCase();
+  const isResolverAdmin = isResolverOwner || (isConnected && address && isResolverAdminFromContract === true);
+
+  const isAdmin = isCrediblesAdmin || isAttestationNFTAdmin || isResolverAdmin;
+  const isLoadingAccess = isLoadingCrediblesOwner || isLoadingCrediblesAdmin || 
+                          isLoadingAttestationNFTOwner || isLoadingAttestationNFTAdmin ||
+                          isLoadingResolverOwner || isLoadingResolverAdmin;
+
+  // Contract state reads - CrediblesV2
+  const { data: crediblesAttestationResolver } = useReadContract({
     address: crediblesV2Address,
     abi: CREDIBLES_V2_ABI,
     functionName: "attestationResolver",
@@ -87,6 +163,53 @@ export default function AdminDashboard() {
     functionName: "nextSkillPetId",
     query: {
       enabled: isAdmin && !!crediblesV2Address,
+    },
+  });
+
+  // Contract state reads - AttestationNFT
+  const { data: attestationNFTCrediblesV2 } = useReadContract({
+    address: attestationNFTAddress,
+    abi: ATTESTATION_NFT_ABI,
+    functionName: "crediblesV2Contract",
+    query: {
+      enabled: isAdmin && !!attestationNFTAddress,
+    },
+  });
+
+  const { data: attestationNFTResolver } = useReadContract({
+    address: attestationNFTAddress,
+    abi: ATTESTATION_NFT_ABI,
+    functionName: "attestationResolver",
+    query: {
+      enabled: isAdmin && !!attestationNFTAddress,
+    },
+  });
+
+  const { data: nextAttestationTokenId } = useReadContract({
+    address: attestationNFTAddress,
+    abi: ATTESTATION_NFT_ABI,
+    functionName: "nextTokenId",
+    query: {
+      enabled: isAdmin && !!attestationNFTAddress,
+    },
+  });
+
+  // Contract state reads - AttestationResolver
+  const { data: resolverAttestationNFT } = useReadContract({
+    address: attestationResolverAddress,
+    abi: ATTESTATION_RESOLVER_ABI,
+    functionName: "attestationNFT",
+    query: {
+      enabled: isAdmin && !!attestationResolverAddress,
+    },
+  });
+
+  const { data: schemaUID } = useReadContract({
+    address: attestationResolverAddress,
+    abi: ATTESTATION_RESOLVER_ABI,
+    functionName: "schemaUID",
+    query: {
+      enabled: isAdmin && !!attestationResolverAddress,
     },
   });
 
@@ -106,6 +229,11 @@ export default function AdminDashboard() {
   const [verifyIssuerDomain, setVerifyIssuerDomain] = useState("");
   const [verifyDomainInput, setVerifyDomainInput] = useState("");
   const [resolverAddress, setResolverAddress] = useState("");
+  const [adminAddress, setAdminAddress] = useState("");
+  const [adminContract, setAdminContract] = useState<"credibles" | "attestationNFT" | "resolver">("credibles");
+  const [attestationNFTCrediblesAddress, setAttestationNFTCrediblesAddress] = useState("");
+  const [attestationNFTResolverAddress, setAttestationNFTResolverAddress] = useState("");
+  const [resolverAttestationNFTAddress, setResolverAttestationNFTAddress] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -207,6 +335,10 @@ export default function AdminDashboard() {
       setVerifyIssuerDomain("");
       setVerifyDomainInput("");
       setResolverAddress("");
+      setAdminAddress("");
+      setAttestationNFTCrediblesAddress("");
+      setAttestationNFTResolverAddress("");
+      setResolverAttestationNFTAddress("");
       // Reload events after a delay
       setTimeout(() => {
         window.location.reload();
@@ -215,7 +347,7 @@ export default function AdminDashboard() {
   }, [isSuccess]);
 
   const handleVerifyIssuer = async (issuerAddress: string, domain: string) => {
-    if (!isAdmin || !crediblesV2Address) return;
+    if (!isCrediblesAdmin || !crediblesV2Address) return;
 
     setError(null);
     setSuccess(null);
@@ -235,7 +367,7 @@ export default function AdminDashboard() {
 
   const handleVerifyDomain = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isAdmin || !crediblesV2Address || !verifyDomainInput) return;
+    if (!isCrediblesAdmin || !crediblesV2Address || !verifyDomainInput) return;
 
     setError(null);
     setSuccess(null);
@@ -255,7 +387,7 @@ export default function AdminDashboard() {
 
   const handleSetResolver = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isAdmin || !crediblesV2Address || !resolverAddress) return;
+    if (!isCrediblesAdmin || !crediblesV2Address || !resolverAddress) return;
 
     if (!resolverAddress.startsWith("0x") || resolverAddress.length !== 42) {
       setError("Invalid address format");
@@ -280,7 +412,7 @@ export default function AdminDashboard() {
 
   const handleVerifyIssuerForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isAdmin || !crediblesV2Address || !verifyIssuerAddress || !verifyIssuerDomain) return;
+    if (!isCrediblesAdmin || !crediblesV2Address || !verifyIssuerAddress || !verifyIssuerDomain) return;
 
     if (!verifyIssuerAddress.startsWith("0x") || verifyIssuerAddress.length !== 42) {
       setError("Invalid issuer address format");
@@ -299,6 +431,183 @@ export default function AdminDashboard() {
       });
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : "Failed to verify issuer";
+      setError(errorMessage);
+    }
+  };
+
+  const handleAddAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAdmin || !adminAddress) return;
+
+    if (!adminAddress.startsWith("0x") || adminAddress.length !== 42) {
+      setError("Invalid admin address format");
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+
+    try {
+      let contractAddress: `0x${string}`;
+      let abi: any;
+      
+      if (adminContract === "credibles") {
+        if (!isCrediblesAdmin) {
+          setError("You don't have permission to manage CrediblesV2 admins");
+          return;
+        }
+        contractAddress = crediblesV2Address;
+        abi = CREDIBLES_V2_ABI;
+      } else if (adminContract === "attestationNFT") {
+        if (!isAttestationNFTAdmin) {
+          setError("You don't have permission to manage AttestationNFT admins");
+          return;
+        }
+        contractAddress = attestationNFTAddress;
+        abi = ATTESTATION_NFT_ABI;
+      } else {
+        if (!isResolverAdmin) {
+          setError("You don't have permission to manage AttestationResolver admins");
+          return;
+        }
+        contractAddress = attestationResolverAddress;
+        abi = ATTESTATION_RESOLVER_ABI;
+      }
+
+      writeContract({
+        address: contractAddress,
+        abi: abi,
+        functionName: "addAdmin",
+        args: [adminAddress as `0x${string}`],
+      });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to add admin";
+      setError(errorMessage);
+    }
+  };
+
+  const handleRemoveAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAdmin || !adminAddress) return;
+
+    if (!adminAddress.startsWith("0x") || adminAddress.length !== 42) {
+      setError("Invalid admin address format");
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+
+    try {
+      let contractAddress: `0x${string}`;
+      let abi: any;
+      
+      if (adminContract === "credibles") {
+        if (!isCrediblesAdmin) {
+          setError("You don't have permission to manage CrediblesV2 admins");
+          return;
+        }
+        contractAddress = crediblesV2Address;
+        abi = CREDIBLES_V2_ABI;
+      } else if (adminContract === "attestationNFT") {
+        if (!isAttestationNFTAdmin) {
+          setError("You don't have permission to manage AttestationNFT admins");
+          return;
+        }
+        contractAddress = attestationNFTAddress;
+        abi = ATTESTATION_NFT_ABI;
+      } else {
+        if (!isResolverAdmin) {
+          setError("You don't have permission to manage AttestationResolver admins");
+          return;
+        }
+        contractAddress = attestationResolverAddress;
+        abi = ATTESTATION_RESOLVER_ABI;
+      }
+
+      writeContract({
+        address: contractAddress,
+        abi: abi,
+        functionName: "removeAdmin",
+        args: [adminAddress as `0x${string}`],
+      });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to remove admin";
+      setError(errorMessage);
+    }
+  };
+
+  const handleSetAttestationNFTCredibles = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAttestationNFTAdmin || !attestationNFTAddress || !attestationNFTCrediblesAddress) return;
+
+    if (!attestationNFTCrediblesAddress.startsWith("0x") || attestationNFTCrediblesAddress.length !== 42) {
+      setError("Invalid address format");
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+
+    try {
+      writeContract({
+        address: attestationNFTAddress,
+        abi: ATTESTATION_NFT_ABI,
+        functionName: "setCrediblesV2Contract",
+        args: [attestationNFTCrediblesAddress as `0x${string}`],
+      });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to set CrediblesV2 contract";
+      setError(errorMessage);
+    }
+  };
+
+  const handleSetAttestationNFTResolver = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isAttestationNFTAdmin || !attestationNFTAddress || !attestationNFTResolverAddress) return;
+
+    if (!attestationNFTResolverAddress.startsWith("0x") || attestationNFTResolverAddress.length !== 42) {
+      setError("Invalid address format");
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+
+    try {
+      writeContract({
+        address: attestationNFTAddress,
+        abi: ATTESTATION_NFT_ABI,
+        functionName: "setAttestationResolver",
+        args: [attestationNFTResolverAddress as `0x${string}`],
+      });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to set AttestationResolver";
+      setError(errorMessage);
+    }
+  };
+
+  const handleSetResolverAttestationNFT = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!isResolverAdmin || !attestationResolverAddress || !resolverAttestationNFTAddress) return;
+
+    if (!resolverAttestationNFTAddress.startsWith("0x") || resolverAttestationNFTAddress.length !== 42) {
+      setError("Invalid address format");
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+
+    try {
+      writeContract({
+        address: attestationResolverAddress,
+        abi: ATTESTATION_RESOLVER_ABI,
+        functionName: "setAttestationNFT",
+        args: [resolverAttestationNFTAddress as `0x${string}`],
+      });
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to set AttestationNFT";
       setError(errorMessage);
     }
   };
@@ -343,9 +652,17 @@ export default function AdminDashboard() {
           <p className={styles.addressInfo}>
             Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
             <br />
-            Owner: {ownerAddress?.slice(0, 6)}...{ownerAddress?.slice(-4)}
+            CrediblesV2 Owner: {crediblesV2Owner?.slice(0, 6)}...{crediblesV2Owner?.slice(-4)}
             <br />
-            Admin Status: {isAdminAddress === true ? "Yes" : "No"}
+            CrediblesV2 Admin: {isCrediblesAdmin === true ? "Yes" : "No"}
+            <br />
+            AttestationNFT Owner: {attestationNFTOwner?.slice(0, 6)}...{attestationNFTOwner?.slice(-4)}
+            <br />
+            AttestationNFT Admin: {isAttestationNFTAdmin === true ? "Yes" : "No"}
+            <br />
+            AttestationResolver Owner: {resolverOwner?.slice(0, 6)}...{resolverOwner?.slice(-4)}
+            <br />
+            AttestationResolver Admin: {isResolverAdmin === true ? "Yes" : "No"}
           </p>
         </div>
       </div>
@@ -368,20 +685,56 @@ export default function AdminDashboard() {
           <h2>Contract State</h2>
           <div className={styles.infoGrid}>
             <div className={styles.infoCard}>
-              <h3>Contract Owner</h3>
-              <p className={styles.address}>{ownerAddress}</p>
+              <h3>CrediblesV2 Owner</h3>
+              <p className={styles.address}>{crediblesV2Owner || "N/A"}</p>
             </div>
             <div className={styles.infoCard}>
-              <h3>Your Role</h3>
-              <p>{isOwner ? "Owner" : "Admin"}</p>
+              <h3>Your CrediblesV2 Role</h3>
+              <p>{isCrediblesOwner ? "Owner" : isCrediblesAdmin ? "Admin" : "None"}</p>
             </div>
             <div className={styles.infoCard}>
-              <h3>Attestation Resolver</h3>
-              <p className={styles.address}>{attestationResolver || "Not set"}</p>
+              <h3>CrediblesV2 Resolver</h3>
+              <p className={styles.address}>{crediblesAttestationResolver || "Not set"}</p>
             </div>
             <div className={styles.infoCard}>
               <h3>Next SkillPet ID</h3>
               <p>{nextSkillPetId?.toString() || "0"}</p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>AttestationNFT Owner</h3>
+              <p className={styles.address}>{attestationNFTOwner || "N/A"}</p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>Your AttestationNFT Role</h3>
+              <p>{isAttestationNFTOwner ? "Owner" : isAttestationNFTAdmin ? "Admin" : "None"}</p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>AttestationNFT CrediblesV2</h3>
+              <p className={styles.address}>{attestationNFTCrediblesV2 || "Not set"}</p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>AttestationNFT Resolver</h3>
+              <p className={styles.address}>{attestationNFTResolver || "Not set"}</p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>Next Attestation Token ID</h3>
+              <p>{nextAttestationTokenId?.toString() || "0"}</p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>AttestationResolver Owner</h3>
+              <p className={styles.address}>{resolverOwner || "N/A"}</p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>Your Resolver Role</h3>
+              <p>{isResolverOwner ? "Owner" : isResolverAdmin ? "Admin" : "None"}</p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>Resolver AttestationNFT</h3>
+              <p className={styles.address}>{resolverAttestationNFT || "Not set"}</p>
+            </div>
+            <div className={styles.infoCard}>
+              <h3>Schema UID</h3>
+              <p className={styles.address}>{schemaUID || "N/A"}</p>
             </div>
             <div className={styles.infoCard}>
               <h3>Pending Issuers</h3>
@@ -565,7 +918,7 @@ export default function AdminDashboard() {
 
             {/* Set Resolver Form */}
             <div className={styles.operationCard}>
-              <h3>Set Attestation Resolver</h3>
+              <h3>Set Attestation Resolver (CrediblesV2)</h3>
               <form onSubmit={handleSetResolver} className={styles.form}>
                 <div className={styles.inputGroup}>
                   <label htmlFor="resolver">Resolver Address</label>
@@ -576,15 +929,157 @@ export default function AdminDashboard() {
                     onChange={(e) => setResolverAddress(e.target.value)}
                     placeholder="0x..."
                     required
-                    disabled={isPending || isConfirming}
+                    disabled={isPending || isConfirming || !isCrediblesAdmin}
                   />
                 </div>
                 <button
                   type="submit"
-                  disabled={isPending || isConfirming}
+                  disabled={isPending || isConfirming || !isCrediblesAdmin}
                   className={styles.submitButton}
                 >
                   {isPending || isConfirming ? "Processing..." : "Set Resolver"}
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        {/* Admin Management */}
+        <section className={styles.section}>
+          <h2>Admin Management</h2>
+          <div className={styles.operationsGrid}>
+            <div className={styles.operationCard}>
+              <h3>Add/Remove Admin</h3>
+              <form onSubmit={handleAddAdmin} className={styles.form}>
+                <div className={styles.inputGroup}>
+                  <label htmlFor="admin-contract">Contract</label>
+                  <select
+                    id="admin-contract"
+                    value={adminContract}
+                    onChange={(e) => setAdminContract(e.target.value as "credibles" | "attestationNFT" | "resolver")}
+                    disabled={isPending || isConfirming}
+                  >
+                    <option value="credibles">CrediblesV2</option>
+                    <option value="attestationNFT">AttestationNFT</option>
+                    <option value="resolver">AttestationResolver</option>
+                  </select>
+                </div>
+                <div className={styles.inputGroup}>
+                  <label htmlFor="admin-address">Admin Address</label>
+                  <input
+                    id="admin-address"
+                    type="text"
+                    value={adminAddress}
+                    onChange={(e) => setAdminAddress(e.target.value)}
+                    placeholder="0x..."
+                    required
+                    disabled={isPending || isConfirming}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: "0.5rem" }}>
+                  <button
+                    type="submit"
+                    disabled={isPending || isConfirming}
+                    className={styles.submitButton}
+                  >
+                    {isPending || isConfirming ? "Processing..." : "Add Admin"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRemoveAdmin}
+                    disabled={isPending || isConfirming}
+                    className={styles.submitButton}
+                    style={{ background: "linear-gradient(135deg, #ef4444 0%, #dc2626 100%)" }}
+                  >
+                    {isPending || isConfirming ? "Processing..." : "Remove Admin"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        {/* AttestationNFT Management */}
+        <section className={styles.section}>
+          <h2>AttestationNFT Management</h2>
+          <div className={styles.operationsGrid}>
+            <div className={styles.operationCard}>
+              <h3>Set CrediblesV2 Contract</h3>
+              <form onSubmit={handleSetAttestationNFTCredibles} className={styles.form}>
+                <div className={styles.inputGroup}>
+                  <label htmlFor="attestation-nft-credibles">CrediblesV2 Address</label>
+                  <input
+                    id="attestation-nft-credibles"
+                    type="text"
+                    value={attestationNFTCrediblesAddress}
+                    onChange={(e) => setAttestationNFTCrediblesAddress(e.target.value)}
+                    placeholder="0x..."
+                    required
+                    disabled={isPending || isConfirming || !isAttestationNFTAdmin}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isPending || isConfirming || !isAttestationNFTAdmin}
+                  className={styles.submitButton}
+                >
+                  {isPending || isConfirming ? "Processing..." : "Set CrediblesV2"}
+                </button>
+              </form>
+            </div>
+
+            <div className={styles.operationCard}>
+              <h3>Set AttestationResolver</h3>
+              <form onSubmit={handleSetAttestationNFTResolver} className={styles.form}>
+                <div className={styles.inputGroup}>
+                  <label htmlFor="attestation-nft-resolver">Resolver Address</label>
+                  <input
+                    id="attestation-nft-resolver"
+                    type="text"
+                    value={attestationNFTResolverAddress}
+                    onChange={(e) => setAttestationNFTResolverAddress(e.target.value)}
+                    placeholder="0x..."
+                    required
+                    disabled={isPending || isConfirming || !isAttestationNFTAdmin}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isPending || isConfirming || !isAttestationNFTAdmin}
+                  className={styles.submitButton}
+                >
+                  {isPending || isConfirming ? "Processing..." : "Set Resolver"}
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        {/* AttestationResolver Management */}
+        <section className={styles.section}>
+          <h2>AttestationResolver Management</h2>
+          <div className={styles.operationsGrid}>
+            <div className={styles.operationCard}>
+              <h3>Set AttestationNFT Contract</h3>
+              <form onSubmit={handleSetResolverAttestationNFT} className={styles.form}>
+                <div className={styles.inputGroup}>
+                  <label htmlFor="resolver-attestation-nft">AttestationNFT Address</label>
+                  <input
+                    id="resolver-attestation-nft"
+                    type="text"
+                    value={resolverAttestationNFTAddress}
+                    onChange={(e) => setResolverAttestationNFTAddress(e.target.value)}
+                    placeholder="0x..."
+                    required
+                    disabled={isPending || isConfirming || !isResolverAdmin}
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={isPending || isConfirming || !isResolverAdmin}
+                  className={styles.submitButton}
+                >
+                  {isPending || isConfirming ? "Processing..." : "Set AttestationNFT"}
                 </button>
               </form>
             </div>
