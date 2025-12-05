@@ -55,28 +55,28 @@ async function main() {
 
   console.log(`CrediblesV2 deployed to: ${crediblesV2Address}`);
 
-  console.log("Deploying IssuerRegistry contract...");
+  console.log("Deploying AttestationNFT contract...");
   
-  const issuerRegistryArtifact = JSON.parse(
-    readFileSync("./artifacts/contracts/IssuerRegistry.sol/IssuerRegistry.json", "utf-8")
+  const attestationNFTArtifact = JSON.parse(
+    readFileSync("./artifacts/contracts/AttestationNFT.sol/AttestationNFT.json", "utf-8")
   );
   
-  const issuerRegistryHash = await walletClient.deployContract({
-    abi: issuerRegistryArtifact.abi,
-    bytecode: issuerRegistryArtifact.bytecode as `0x${string}`,
-    args: [account.address],
+  const attestationNFTHash = await walletClient.deployContract({
+    abi: attestationNFTArtifact.abi,
+    bytecode: attestationNFTArtifact.bytecode as `0x${string}`,
+    args: [account.address, crediblesV2Address], // owner, crediblesV2Contract
   });
 
-  console.log(`IssuerRegistry deployment transaction: ${issuerRegistryHash}`);
+  console.log(`AttestationNFT deployment transaction: ${attestationNFTHash}`);
   
-  const issuerRegistryReceipt = await waitForTransactionReceipt(publicClient, { hash: issuerRegistryHash });
-  const issuerRegistryAddress = issuerRegistryReceipt.contractAddress;
+  const attestationNFTReceipt = await waitForTransactionReceipt(publicClient, { hash: attestationNFTHash });
+  const attestationNFTAddress = attestationNFTReceipt.contractAddress;
   
-  if (!issuerRegistryAddress) {
-    throw new Error("IssuerRegistry deployment failed - no contract address");
+  if (!attestationNFTAddress) {
+    throw new Error("AttestationNFT deployment failed - no contract address");
   }
 
-  console.log(`IssuerRegistry deployed to: ${issuerRegistryAddress}`);
+  console.log(`AttestationNFT deployed to: ${attestationNFTAddress}`);
 
   // Save deployment to history
   const deploymentFile = "./deployments.json";
@@ -107,9 +107,9 @@ async function main() {
         txHash: crediblesV2Hash,
       },
       {
-        name: "IssuerRegistry",
-        address: issuerRegistryAddress,
-        txHash: issuerRegistryHash,
+        name: "AttestationNFT",
+        address: attestationNFTAddress,
+        txHash: attestationNFTHash,
       },
     ],
   };
@@ -136,17 +136,17 @@ async function main() {
         }
       }
 
-      // Verify IssuerRegistry
+      // Verify AttestationNFT
       try {
         execSync(
-          `npx hardhat verify --network baseSepolia ${issuerRegistryAddress} "${account.address}"`,
+          `npx hardhat verify --network baseSepolia ${attestationNFTAddress} "${account.address}" "${crediblesV2Address}"`,
           { stdio: "inherit" }
         );
       } catch (error: any) {
         if (error.message?.includes("already verified") || error.message?.includes("Already Verified")) {
-          console.log("✅ IssuerRegistry already verified");
+          console.log("✅ AttestationNFT already verified");
         } else {
-          console.warn("⚠️  IssuerRegistry verification failed (may already be verified)");
+          console.warn("⚠️  AttestationNFT verification failed (may already be verified)");
         }
       }
     } catch (error) {
@@ -156,17 +156,17 @@ async function main() {
     console.log("\n⚠️  BASESCAN_API_KEY not set. Skipping verification.");
     console.log("   To verify manually, run:");
     console.log(`   npx hardhat verify --network baseSepolia ${crediblesV2Address} "${account.address}"`);
-    console.log(`   npx hardhat verify --network baseSepolia ${issuerRegistryAddress} "${account.address}"`);
+    console.log(`   npx hardhat verify --network baseSepolia ${attestationNFTAddress} "${account.address}" "${crediblesV2Address}"`);
   }
 
   console.log("\n=== Deployment Summary ===");
   console.log(`CrediblesV2: ${crediblesV2Address}`);
   console.log(`   Explorer: https://sepolia.basescan.org/address/${crediblesV2Address}`);
-  console.log(`IssuerRegistry: ${issuerRegistryAddress}`);
-  console.log(`   Explorer: https://sepolia.basescan.org/address/${issuerRegistryAddress}`);
+  console.log(`AttestationNFT: ${attestationNFTAddress}`);
+  console.log(`   Explorer: https://sepolia.basescan.org/address/${attestationNFTAddress}`);
   console.log("\n📝 Add these to your Credibles/.env.local file:");
   console.log(`NEXT_PUBLIC_CREDIBLES_V2_CONTRACT_ADDRESS=${crediblesV2Address}`);
-  console.log(`NEXT_PUBLIC_ISSUER_REGISTRY_ADDRESS=${issuerRegistryAddress}`);
+  console.log(`NEXT_PUBLIC_ATTESTATION_NFT_CONTRACT_ADDRESS=${attestationNFTAddress}`);
 }
 
 main()

@@ -50,5 +50,22 @@
         "txHash": "0xa749dfdb2be8bc8d08f2c56fc048348e95629998e3c9fba697f919cef8a48261"
       }
     ]
+  },
+  {
+    "network": "base-sepolia",
+    "timestamp": "2025-12-05T06:01:48.038Z",
+    "owner": "0x41b1e204e9c15fF5894bd47C6Dc3a7Fa98C775C7",
+    "contracts": [
+      {
+        "name": "CrediblesV2",
+        "address": "0x8fa4af52e76c35b2cb3a48d0d470ec48c6c3633d",
+        "txHash": "0xb1338eea777f26f69ca2a843e553e7cba8f219b322e7e1406b5ad2ffe18d3618"
+      },
+      {
+        "name": "AttestationNFT",
+        "address": "0x9862f0440fe29d456ada6e7585a308cce531e018",
+        "txHash": "0xea104b3e1c685aa7a5769caf4f8365342f3c1c472d3dcaaa009d2210e193a3c8"
+      }
+    ]
   }
 ]

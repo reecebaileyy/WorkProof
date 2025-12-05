@@ -45,6 +45,7 @@ export default function Home() {
 
   const crediblesV2Address = process.env.NEXT_PUBLIC_CREDIBLES_V2_CONTRACT_ADDRESS as `0x${string}` || 
     process.env.NEXT_PUBLIC_CREDIBLES_CONTRACT_ADDRESS as `0x${string}`;
+  const attestationNFTAddress = process.env.NEXT_PUBLIC_ATTESTATION_NFT_CONTRACT_ADDRESS as `0x${string}`;
 
   // Get resume wallet if user type is "user"
   const { data: registeredWallet } = useReadContract({
@@ -445,7 +446,10 @@ export default function Home() {
           <>
             {isVerifiedIssuer ? (
               <>
-                <CreateAttestation contractAddress={crediblesV2Address} />
+                <CreateAttestation 
+                  crediblesV2Address={crediblesV2Address} 
+                  attestationNFTAddress={attestationNFTAddress || "0x0000000000000000000000000000000000000000"}
+                />
               </>
             ) : (
               <IssuerVerification contractAddress={crediblesV2Address} />
@@ -460,7 +464,10 @@ export default function Home() {
               />
             ) : (
               <>
-                <NFTGallery contractAddress={crediblesV2Address} />
+                <NFTGallery 
+                  crediblesV2Address={crediblesV2Address} 
+                  attestationNFTAddress={attestationNFTAddress || "0x0000000000000000000000000000000000000000"}
+                />
                 
                 {/* Skill Tree Section */}
                 {skillPetStats && (
