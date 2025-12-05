@@ -37,6 +37,9 @@ contract CrediblesV2 is ERC721, Ownable {
     // ============ EAS Integration ============
     address public attestationResolver; // EAS AttestationResolver contract address
 
+    // ============ Admin Management ============
+    mapping(address => bool) public admins; // admin address => is admin
+
     // ============ Token ID Management ============
     uint256 public nextSkillPetId = 1;
 
@@ -48,8 +51,39 @@ contract CrediblesV2 is ERC721, Ownable {
     event IssuerVerified(address indexed issuer, string domain);
     event IssuerVerificationRequested(address indexed issuer, string domain);
     event ResumeWalletRegistered(address indexed user, address indexed resumeWallet);
+    event AdminAdded(address indexed admin);
+    event AdminRemoved(address indexed admin);
 
     constructor(address initialOwner) ERC721("Credibles V2", "CRED2") Ownable(initialOwner) {}
+
+    // ============ Admin Management Functions ============
+
+    /**
+     * @dev Modifier to allow owner or admin
+     */
+    modifier onlyOwnerOrAdmin() {
+        require(owner() == msg.sender || admins[msg.sender], "Not owner or admin");
+        _;
+    }
+
+    /**
+     * @dev Owner can add an admin
+     */
+    function addAdmin(address admin) external onlyOwner {
+        require(admin != address(0), "Invalid address");
+        require(!admins[admin], "Already an admin");
+        admins[admin] = true;
+        emit AdminAdded(admin);
+    }
+
+    /**
+     * @dev Owner can remove an admin
+     */
+    function removeAdmin(address admin) external onlyOwner {
+        require(admins[admin], "Not an admin");
+        admins[admin] = false;
+        emit AdminRemoved(admin);
+    }
 
     // ============ Issuer Management Functions ============
 
@@ -66,9 +100,9 @@ contract CrediblesV2 is ERC721, Ownable {
     }
 
     /**
-     * @dev Owner can verify an issuer and their domain
+     * @dev Owner or admin can verify an issuer and their domain
      */
-    function verifyIssuer(address issuer, string memory emailDomain) external onlyOwner {
+    function verifyIssuer(address issuer, string memory emailDomain) external onlyOwnerOrAdmin {
         require(bytes(emailDomain).length > 0, "Domain cannot be empty");
         require(!verifiedIssuers[issuer], "Already verified");
 
@@ -81,9 +115,9 @@ contract CrediblesV2 is ERC721, Ownable {
     }
 
     /**
-     * @dev Owner can verify a domain (for bulk verification)
+     * @dev Owner or admin can verify a domain (for bulk verification)
      */
-    function verifyDomain(string memory emailDomain) external onlyOwner {
+    function verifyDomain(string memory emailDomain) external onlyOwnerOrAdmin {
         require(bytes(emailDomain).length > 0, "Domain cannot be empty");
         verifiedDomains[emailDomain] = true;
     }
@@ -177,9 +211,9 @@ contract CrediblesV2 is ERC721, Ownable {
     }
 
     /**
-     * @dev Set the AttestationResolver address (only owner)
+     * @dev Set the AttestationResolver address (only owner or admin)
      */
-    function setAttestationResolver(address _attestationResolver) external onlyOwner {
+    function setAttestationResolver(address _attestationResolver) external onlyOwnerOrAdmin {
         require(_attestationResolver != address(0), "Invalid address");
         attestationResolver = _attestationResolver;
     }

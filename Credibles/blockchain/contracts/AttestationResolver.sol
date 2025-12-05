@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import "./IEAS.sol";
 import "./ISchemaRegistry.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title AttestationResolver
@@ -13,11 +14,14 @@ interface ICrediblesV2 {
     function addXP(uint256 tokenId, string memory category, uint256 amount) external;
 }
 
-contract AttestationResolver {
+contract AttestationResolver is Ownable {
     IEAS public immutable eas;
     ISchemaRegistry public immutable schemaRegistry;
     ICrediblesV2 public immutable credibles;
     bytes32 public schemaUID;
+
+    // ============ Admin Management ============
+    mapping(address => bool) public admins; // admin address => is admin
 
     /// @notice Emitted when an attestation is processed
     event AttestationProcessed(
@@ -26,18 +30,22 @@ contract AttestationResolver {
         string category,
         uint256 xpValue
     );
+    event AdminAdded(address indexed admin);
+    event AdminRemoved(address indexed admin);
 
     /**
      * @notice Constructor
      * @param _eas The EAS contract address (Base Sepolia: 0x4200000000000000000000000000000000000021)
      * @param _schemaRegistry The SchemaRegistry contract address (Base Sepolia: 0x4200000000000000000000000000000000000020)
      * @param _credibles The CrediblesV2 contract address
+     * @param _initialOwner The initial owner of the contract
      */
     constructor(
         address _eas,
         address _schemaRegistry,
-        address _credibles
-    ) {
+        address _credibles,
+        address _initialOwner
+    ) Ownable(_initialOwner) {
         eas = IEAS(_eas);
         schemaRegistry = ISchemaRegistry(_schemaRegistry);
         credibles = ICrediblesV2(_credibles);
@@ -48,6 +56,35 @@ contract AttestationResolver {
             address(this),
             true
         );
+    }
+
+    // ============ Admin Management Functions ============
+
+    /**
+     * @dev Modifier to allow owner or admin
+     */
+    modifier onlyOwnerOrAdmin() {
+        require(owner() == msg.sender || admins[msg.sender], "Not owner or admin");
+        _;
+    }
+
+    /**
+     * @dev Owner can add an admin
+     */
+    function addAdmin(address admin) external onlyOwner {
+        require(admin != address(0), "Invalid address");
+        require(!admins[admin], "Already an admin");
+        admins[admin] = true;
+        emit AdminAdded(admin);
+    }
+
+    /**
+     * @dev Owner can remove an admin
+     */
+    function removeAdmin(address admin) external onlyOwner {
+        require(admins[admin], "Not an admin");
+        admins[admin] = false;
+        emit AdminRemoved(admin);
     }
 
     /**
