@@ -59,6 +59,92 @@
   }
 
   /* Global input styles for better visibility */
+  @media (prefers-color-scheme: dark) {
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    textarea,
+    select {
+      background: rgba(255, 255, 255, 0.15) !important;
+      border: 1px solid rgba(255, 255, 255, 0.3) !important;
+      color: #ffffff !important;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="number"]::placeholder,
+    input[type="email"]::placeholder,
+    input[type="password"]::placeholder,
+    input[type="search"]::placeholder,
+    textarea::placeholder {
+      color: rgba(255, 255, 255, 0.5) !important;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="search"]:focus,
+    textarea:focus,
+    select:focus {
+      background: rgba(255, 255, 255, 0.25) !important;
+    }
+
+    input[type="text"]:disabled,
+    input[type="number"]:disabled,
+    input[type="email"]:disabled,
+    input[type="password"]:disabled,
+    input[type="search"]:disabled,
+    textarea:disabled,
+    select:disabled {
+      background: rgba(255, 255, 255, 0.08) !important;
+    }
+  }
+
+  @media (prefers-color-scheme: light) {
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"],
+    input[type="search"],
+    textarea,
+    select {
+      background: rgba(0, 0, 0, 0.05) !important;
+      border: 1px solid rgba(0, 0, 0, 0.2) !important;
+      color: #000000 !important;
+    }
+
+    input[type="text"]::placeholder,
+    input[type="number"]::placeholder,
+    input[type="email"]::placeholder,
+    input[type="password"]::placeholder,
+    input[type="search"]::placeholder,
+    textarea::placeholder {
+      color: rgba(0, 0, 0, 0.5) !important;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="email"]:focus,
+    input[type="password"]:focus,
+    input[type="search"]:focus,
+    textarea:focus,
+    select:focus {
+      background: rgba(0, 0, 0, 0.08) !important;
+    }
+
+    input[type="text"]:disabled,
+    input[type="number"]:disabled,
+    input[type="email"]:disabled,
+    input[type="password"]:disabled,
+    input[type="search"]:disabled,
+    textarea:disabled,
+    select:disabled {
+      background: rgba(0, 0, 0, 0.03) !important;
+    }
+  }
+
   input[type="text"],
   input[type="number"],
   input[type="email"],
@@ -66,22 +152,10 @@
   input[type="search"],
   textarea,
   select {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: #ffffff !important;
     border-radius: 8px;
     padding: 0.75rem 1rem;
     font-size: 1rem;
     transition: all 0.2s;
-  }
-
-  input[type="text"]::placeholder,
-  input[type="number"]::placeholder,
-  input[type="email"]::placeholder,
-  input[type="password"]::placeholder,
-  input[type="search"]::placeholder,
-  textarea::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
   }
 
   input[type="text"]:focus,
@@ -93,7 +167,6 @@
   select:focus {
     outline: none;
     border-color: #0052ff !important;
-    background: rgba(255, 255, 255, 0.25) !important;
     box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.1);
   }
 
@@ -106,6 +179,5 @@
   select:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    background: rgba(255, 255, 255, 0.08) !important;
   }
 }

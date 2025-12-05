@@ -471,7 +471,9 @@ export default function Home() {
                 />
                 
                 {/* Skill Tree Section */}
-                {skillPetStats && (
+                {skillPetStats && (() => {
+                  const evolution = getEvolutionStatus(skillPetStats);
+                  return (
               <section className={styles.skillTree}>
                 <div className={styles.skillTreeHeader}>
                       <h2>Skill Tree</h2>
@@ -519,7 +521,8 @@ export default function Home() {
                     })}
                   </div>
                   </section>
-                )}
+                  );
+                })()}
 
                 {/* Daily Task Modal */}
                 {dailyTaskOpen && quizQuestion && (
