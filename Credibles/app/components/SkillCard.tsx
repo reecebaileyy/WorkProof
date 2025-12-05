@@ -45,13 +45,13 @@ export default function SkillCard({
     position: "relative",
     borderRadius: 24,
     padding: 24,
-    background: "rgba(255, 255, 255, 0.03)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
+    background: "var(--card-bg)",
+    border: "1px solid var(--card-border)",
     backdropFilter: "blur(20px)",
     WebkitBackdropFilter: "blur(20px)",
     boxShadow: isHovered
-      ? "0 20px 40px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1)"
-      : "0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05)",
+      ? "var(--glass-shadow), inset 0 0 0 1px var(--card-border)"
+      : "var(--glass-shadow)",
     transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
     transform: isHovered ? "translateY(-4px)" : "translateY(0)",
     overflow: "hidden",
@@ -65,22 +65,22 @@ export default function SkillCard({
     width: 64,
     height: 64,
     borderRadius: 20,
-    background: "rgba(0, 0, 0, 0.3)",
+    background: "rgba(128, 128, 128, 0.15)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontSize: 32,
     marginBottom: 20,
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    boxShadow: "0 8px 20px rgba(0, 0, 0, 0.2)",
+    border: "1px solid var(--card-border)",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
   };
 
   const levelBadgeStyle: React.CSSProperties = {
     position: "absolute",
     top: 24,
     right: 24,
-    background: "rgba(255, 255, 255, 0.05)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
+    background: "rgba(128, 128, 128, 0.1)",
+    border: "1px solid var(--card-border)",
     padding: "6px 12px",
     borderRadius: 12,
     display: "flex",
@@ -92,14 +92,14 @@ export default function SkillCard({
     fontSize: 10,
     textTransform: "uppercase",
     letterSpacing: "0.1em",
-    color: "rgba(255, 255, 255, 0.5)",
+    color: "color-mix(in srgb, var(--foreground), transparent 50%)",
     fontWeight: 600,
   };
 
   const levelValueStyle: React.CSSProperties = {
     fontSize: 18,
     fontWeight: 700,
-    color: "#fff",
+    color: "var(--foreground)",
     lineHeight: 1,
     marginTop: 2,
   };
@@ -107,14 +107,14 @@ export default function SkillCard({
   const titleStyle: React.CSSProperties = {
     fontSize: 24,
     fontWeight: 700,
-    color: "#fff",
+    color: "var(--foreground)",
     marginBottom: 4,
     letterSpacing: "-0.02em",
   };
 
   const xpStyle: React.CSSProperties = {
     fontSize: 14,
-    color: "rgba(255, 255, 255, 0.6)",
+    color: "color-mix(in srgb, var(--foreground), transparent 40%)",
     marginBottom: 24,
     fontFamily:
       "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
@@ -127,13 +127,13 @@ export default function SkillCard({
     fontWeight: 600,
     textTransform: "uppercase",
     letterSpacing: "0.05em",
-    color: "rgba(255, 255, 255, 0.5)",
+    color: "color-mix(in srgb, var(--foreground), transparent 50%)",
     marginBottom: 8,
   };
 
   const progressContainerStyle: React.CSSProperties = {
     height: 8,
-    background: "rgba(255, 255, 255, 0.1)",
+    background: "rgba(128, 128, 128, 0.2)",
     borderRadius: 999,
     overflow: "hidden",
     marginBottom: 24,
@@ -154,7 +154,7 @@ export default function SkillCard({
     padding: "14px",
     borderRadius: 16,
     border: "none",
-    background: isAddingXP ? "rgba(255, 255, 255, 0.05)" : gradient,
+    background: isAddingXP ? "rgba(128, 128, 128, 0.2)" : gradient,
     color: "white",
     fontSize: 14,
     fontWeight: 600,
@@ -165,7 +165,7 @@ export default function SkillCard({
     alignItems: "center",
     justifyContent: "center",
     gap: 8,
-    boxShadow: isAddingXP ? "none" : "0 4px 12px rgba(0, 0, 0, 0.2)",
+    boxShadow: isAddingXP ? "none" : "0 4px 12px rgba(0, 0, 0, 0.15)",
   };
 
   return (

@@ -1,15 +1,12 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Custom CSS Variables and Styles */
 
-@layer base {
-  :root {
+:root {
     /* Apple-inspired Color Palette */
     --background: #f5f5f7; /* Light gray background */
     --foreground: #1d1d1f; /* Almost black text */
-    --card-bg: rgba(255, 255, 255, 0.7);
-    --card-border: rgba(255, 255, 255, 0.8);
-    --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --card-border: rgba(0, 0, 0, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
 
     /* Accents */
     --accent-blue: #0071e3;
@@ -138,7 +135,7 @@
     transform: scale(1.02);
   }
 
-  /* Global input styles for better visibility */
+  /* Inputs */
   input[type="text"],
   input[type="number"],
   input[type="email"],
@@ -146,42 +143,36 @@
   input[type="search"],
   textarea,
   select {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: #ffffff !important;
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
+    background: rgba(128, 128, 128, 0.1) !important;
+    border: 1px solid transparent !important;
+    color: var(--foreground) !important;
+    border-radius: 12px;
+    padding: 1rem;
     font-size: 1rem;
     transition: all 0.2s;
-  }
-
-  input[type="text"]::placeholder,
-  input[type="number"]::placeholder,
-  input[type="email"]::placeholder,
-  input[type="password"]::placeholder,
-  input[type="search"]::placeholder,
-  textarea::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
+    width: 100%;
   }
 
   input:focus,
   textarea:focus,
   select:focus {
     outline: none;
-    border-color: #0052ff !important;
-    background: rgba(255, 255, 255, 0.25) !important;
-    box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.1);
+    background: rgba(128, 128, 128, 0.15) !important;
+    box-shadow: 0 0 0 2px var(--accent-blue);
   }
 
-  input[type="text"]:disabled,
-  input[type="number"]:disabled,
-  input[type="email"]:disabled,
-  input[type="password"]:disabled,
-  input[type="search"]:disabled,
-  textarea:disabled,
-  select:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background: rgba(255, 255, 255, 0.08) !important;
+  /* Animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
-}
+
+  .animate-fade-in {
+    animation: fadeIn 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  }

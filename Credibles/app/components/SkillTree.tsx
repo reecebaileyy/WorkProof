@@ -78,23 +78,22 @@ export function SkillTree() {
     fontSize: 24,
     fontWeight: 700,
     marginBottom: 24,
-    color: "#e5e7eb",
+    color: "var(--foreground)",
     letterSpacing: "-0.02em",
   };
 
   const cardStyle: CSSProperties = {
     borderRadius: 24,
-    border: "1px solid rgba(255,255,255,0.1)",
-    backgroundImage:
-      "radial-gradient(circle at top, rgba(148,163,184,0.15), rgba(15,23,42,0.95) 60%)",
+    border: "1px solid var(--card-border)",
+    background: "var(--card-bg)",
     padding: 24,
-    boxShadow: "0 18px 45px rgba(15,23,42,0.8)",
+    boxShadow: "var(--glass-shadow)",
     backdropFilter: "blur(18px)",
   };
 
   const skeletonBlock: CSSProperties = {
     borderRadius: 8,
-    backgroundColor: "rgba(15,23,42,0.6)",
+    backgroundColor: "rgba(128, 128, 128, 0.2)",
   };
 
   if (isLoading) {
@@ -128,9 +127,9 @@ export function SkillTree() {
   if (!exists) {
     return (
       <div style={containerStyle}>
-        <h2 style={headerStyle}>Skill Tree</h2>
+        <h2 style={headerStyle}>🌳 Skill Tree</h2>
         <div style={{ ...cardStyle, textAlign: "center", padding: 48 }}>
-          <p style={{ color: "#9ca3af", fontSize: 16 }}>
+          <p style={{ color: "color-mix(in srgb, var(--foreground), transparent 40%)", fontSize: 16 }}>
             No SkillPet found. Mint your SkillPet to start tracking your skills!
           </p>
         </div>
@@ -140,7 +139,7 @@ export function SkillTree() {
 
   return (
     <div style={containerStyle}>
-      <h2 style={headerStyle}>Skill Tree</h2>
+      <h2 style={headerStyle}>🌳 Skill Tree</h2>
       <div style={cardStyle}>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
           {SKILL_CATEGORIES.map((category) => {
@@ -199,7 +198,7 @@ export function SkillTree() {
                   <span
                     style={{
                       fontSize: 13,
-                      color: "#9ca3af",
+                      color: "color-mix(in srgb, var(--foreground), transparent 40%)",
                       fontFamily:
                         "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
                     }}
@@ -212,12 +211,12 @@ export function SkillTree() {
                   style={{
                     width: "100%",
                     height: 20,
-                    backgroundColor: "rgba(2,6,23,0.6)",
+                    backgroundColor: "rgba(128, 128, 128, 0.15)",
                     borderRadius: 999,
                     position: "relative",
                     overflow: "hidden",
-                    boxShadow: "inset 0 1px 2px rgba(0,0,0,0.4)",
-                    border: "1px solid rgba(255,255,255,0.05)",
+                    boxShadow: "inset 0 1px 2px rgba(0,0,0,0.1)",
+                    border: "1px solid rgba(128, 128, 128, 0.2)",
                   }}
                 >
                   <div
@@ -276,7 +275,7 @@ export function SkillTree() {
                   <p
                     style={{
                       fontSize: 11,
-                      color: "#6b7280",
+                      color: "color-mix(in srgb, var(--foreground), transparent 50%)",
                       marginTop: 6,
                       fontStyle: "italic",
                     }}

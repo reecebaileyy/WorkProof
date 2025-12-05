@@ -23,19 +23,18 @@ export function SkillPetDisplay() {
 
   const cardStyle: CSSProperties = {
     borderRadius: 24,
-    border: "1px solid rgba(255,255,255,0.15)",
-    backgroundImage:
-      "radial-gradient(circle at top, rgba(148,163,184,0.18), rgba(15,23,42,0.96) 60%)",
+    border: "1px solid var(--card-border)",
+    background: "var(--card-bg)",
     padding: 24,
-    boxShadow: "0 18px 45px rgba(15,23,42,0.85)",
+    boxShadow: "var(--glass-shadow)",
     backdropFilter: "blur(18px)",
-    color: "#e5e7eb",
+    color: "var(--foreground)",
     fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, sans-serif",
   };
 
   const skeletonBlock: CSSProperties = {
     borderRadius: 16,
-    backgroundColor: "rgba(15,23,42,0.8)",
+    backgroundColor: "rgba(128, 128, 128, 0.2)",
   };
 
   if (isLoading) {
@@ -67,7 +66,7 @@ export function SkillPetDisplay() {
             style={{
               height: 256,
               borderRadius: 20,
-              backgroundColor: "rgba(15,23,42,0.9)",
+              backgroundColor: "rgba(128, 128, 128, 0.15)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -76,10 +75,10 @@ export function SkillPetDisplay() {
           >
             <span style={{ fontSize: 48 }}>🥚</span>
           </div>
-          <h3 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8 }}>
+          <h3 style={{ fontSize: 20, fontWeight: 600, marginBottom: 8, color: "var(--foreground)" }}>
             No SkillPet Yet
           </h3>
-          <p style={{ fontSize: 14, color: "#9ca3af", marginBottom: 20 }}>
+          <p style={{ fontSize: 14, color: "color-mix(in srgb, var(--foreground), transparent 40%)", marginBottom: 20 }}>
             Mint your SkillPet NFT to start leveling up your onchain skills.
           </p>
           <button
@@ -170,7 +169,7 @@ export function SkillPetDisplay() {
             <h3 style={{ fontSize: 18, fontWeight: 600 }}>
               SkillPet #{tokenId}
             </h3>
-            <p style={{ fontSize: 12, color: "#9ca3af" }}>
+            <p style={{ fontSize: 12, color: "color-mix(in srgb, var(--foreground), transparent 40%)" }}>
               Your onchain companion for skill progression
             </p>
           </div>
@@ -195,7 +194,7 @@ export function SkillPetDisplay() {
               style={{
                 marginTop: 4,
                 fontSize: 11,
-                color: "#9ca3af",
+                color: "color-mix(in srgb, var(--foreground), transparent 40%)",
               }}
             >
               Total XP: {totalXP.toLocaleString()}
@@ -206,7 +205,7 @@ export function SkillPetDisplay() {
         {/* Stats */}
         <div
           style={{
-            borderTop: "1px solid rgba(148,163,184,0.2)",
+            borderTop: "1px solid var(--card-border)",
             paddingTop: 16,
           }}
         >
@@ -226,7 +225,7 @@ export function SkillPetDisplay() {
 
           <div
             style={{
-              borderTop: "1px solid rgba(148,163,184,0.2)",
+              borderTop: "1px solid var(--card-border)",
               paddingTop: 16,
             }}
           >
@@ -242,7 +241,7 @@ export function SkillPetDisplay() {
                   fontSize: 11,
                   textTransform: "uppercase",
                   letterSpacing: "0.16em",
-                  color: "#9ca3af",
+                  color: "color-mix(in srgb, var(--foreground), transparent 40%)",
                 }}
               >
                 Total Experience
@@ -253,6 +252,7 @@ export function SkillPetDisplay() {
                     "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
                   fontSize: 18,
                   fontWeight: 600,
+                  color: "var(--foreground)",
                 }}
               >
                 {totalXP.toLocaleString()}
@@ -274,15 +274,15 @@ interface StatPillProps {
 function StatPill({ label, value, color }: StatPillProps) {
   const pillStyle: CSSProperties = {
     borderRadius: 18,
-    border: "1px solid rgba(255,255,255,0.12)",
-    backgroundColor: "rgba(15,23,42,0.9)",
+    border: "1px solid var(--card-border)",
+    backgroundColor: "rgba(128, 128, 128, 0.1)",
     padding: "10px 12px",
-    boxShadow: "0 10px 25px rgba(15,23,42,0.7)",
+    boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
   };
 
   return (
     <div style={pillStyle}>
-      <span style={{ display: "block", fontSize: 12, color: "#9ca3af" }}>
+      <span style={{ display: "block", fontSize: 12, color: "color-mix(in srgb, var(--foreground), transparent 40%)" }}>
         {label}
       </span>
       <span

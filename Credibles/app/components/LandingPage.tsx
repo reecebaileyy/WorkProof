@@ -28,15 +28,13 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
     lineHeight: 1.1,
     textAlign: "center",
     marginBottom: 24,
-    background: "linear-gradient(135deg, #fff 0%, #94a3b8 100%)",
-    WebkitBackgroundClip: "text",
-    WebkitTextFillColor: "transparent",
+    color: "var(--foreground)",
     letterSpacing: "-0.03em",
   };
 
   const heroSubtitleStyle: React.CSSProperties = {
     fontSize: 20,
-    color: "#94a3b8",
+    color: "color-mix(in srgb, var(--foreground), transparent 40%)",
     textAlign: "center",
     maxWidth: 600,
     margin: "0 auto 48px",
@@ -62,15 +60,15 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
 
   const glassButtonStyle: React.CSSProperties = {
     ...buttonStyle,
-    background: "rgba(255, 255, 255, 0.05)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
-    color: "white",
+    background: "rgba(128, 128, 128, 0.1)",
+    border: "1px solid var(--card-border)",
+    color: "var(--foreground)",
     backdropFilter: "blur(10px)",
   };
 
   const featureCardStyle: React.CSSProperties = {
-    background: "rgba(255, 255, 255, 0.03)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
+    background: "var(--card-bg)",
+    border: "1px solid var(--card-border)",
     borderRadius: 24,
     padding: 32,
     backdropFilter: "blur(20px)",
@@ -89,8 +87,8 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
     alignItems: "center",
     gap: 24,
     padding: 32,
-    background: "rgba(255, 255, 255, 0.03)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
+    background: "var(--card-bg)",
+    border: "1px solid var(--card-border)",
     borderRadius: 32,
     backdropFilter: "blur(20px)",
     transition: "all 0.3s ease",
@@ -102,13 +100,13 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
     width: 120,
     height: 120,
     borderRadius: "50%",
-    background: "rgba(255, 255, 255, 0.05)",
+    background: "rgba(128, 128, 128, 0.1)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     fontSize: 64,
-    boxShadow: "0 20px 40px rgba(0, 0, 0, 0.2)",
-    border: "1px solid rgba(255, 255, 255, 0.1)",
+    boxShadow: "var(--glass-shadow)",
+    border: "1px solid var(--card-border)",
   };
 
   return (
@@ -181,10 +179,10 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
             <button
               style={glassButtonStyle}
               onMouseEnter={(e) =>
-                (e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)")
+                (e.currentTarget.style.background = "rgba(128, 128, 128, 0.2)")
               }
               onMouseLeave={(e) =>
-                (e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)")
+                (e.currentTarget.style.background = "rgba(128, 128, 128, 0.1)")
               }
             >
               Learn More
@@ -202,7 +200,7 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
               fontWeight: 700,
               textAlign: "center",
               marginBottom: 60,
-              color: "#fff",
+              color: "var(--foreground)",
             }}
           >
             Why Credibles?
@@ -243,10 +241,10 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
                     hoveredFeature === idx
                       ? "translateY(-8px)"
                       : "translateY(0)",
-                  borderColor:
+                  boxShadow:
                     hoveredFeature === idx
-                      ? "rgba(255, 255, 255, 0.2)"
-                      : "rgba(255, 255, 255, 0.08)",
+                      ? "0 12px 40px rgba(0, 0, 0, 0.15)"
+                      : "var(--glass-shadow)",
                 }}
                 onMouseEnter={() => setHoveredFeature(idx)}
                 onMouseLeave={() => setHoveredFeature(null)}
@@ -272,12 +270,12 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
                     fontSize: 24,
                     fontWeight: 700,
                     marginBottom: 12,
-                    color: "#fff",
+                    color: "var(--foreground)",
                   }}
                 >
                   {feature.title}
                 </h3>
-                <p style={{ fontSize: 16, color: "#94a3b8", lineHeight: 1.6 }}>
+                <p style={{ fontSize: 16, color: "color-mix(in srgb, var(--foreground), transparent 40%)", lineHeight: 1.6 }}>
                   {feature.desc}
                 </p>
               </div>
@@ -304,7 +302,7 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
           <p
             style={{
               fontSize: 20,
-              color: "#94a3b8",
+              color: "color-mix(in srgb, var(--foreground), transparent 40%)",
               maxWidth: 700,
               margin: "0 auto 80px",
               lineHeight: 1.6,
@@ -331,7 +329,7 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
                   style={{
                     fontSize: 24,
                     fontWeight: 700,
-                    color: "#fff",
+                    color: "var(--foreground)",
                     marginBottom: 8,
                   }}
                 >
@@ -340,7 +338,7 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
                 <p
                   style={{
                     fontSize: 14,
-                    color: "#94a3b8",
+                    color: "color-mix(in srgb, var(--foreground), transparent 40%)",
                     textTransform: "uppercase",
                     letterSpacing: "0.1em",
                     fontWeight: 700,
@@ -352,7 +350,7 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
             </div>
 
             {/* Arrow */}
-            <div style={{ fontSize: 48, color: "rgba(255, 255, 255, 0.2)" }}>
+            <div style={{ fontSize: 48, color: "color-mix(in srgb, var(--foreground), transparent 80%)" }}>
               →
             </div>
 
@@ -386,7 +384,7 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
                   style={{
                     fontSize: 24,
                     fontWeight: 700,
-                    color: "#fff",
+                    color: "var(--foreground)",
                     marginBottom: 8,
                   }}
                 >
@@ -395,7 +393,7 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
                 <p
                   style={{
                     fontSize: 14,
-                    color: "#A78BFA",
+                    color: "#8B5CF6",
                     textTransform: "uppercase",
                     letterSpacing: "0.1em",
                     fontWeight: 700,
@@ -413,13 +411,13 @@ export default function LandingPage({ onLaunchApp }: LandingPageProps) {
       <footer
         style={{
           padding: "40px 24px",
-          borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+          borderTop: "1px solid var(--card-border)",
           textAlign: "center",
-          color: "#64748b",
+          color: "color-mix(in srgb, var(--foreground), transparent 50%)",
           fontSize: 14,
         }}
       >
-        © 2024 Credibles. Built on Base.
+        © 2025 Credibles. Built on Base.
       </footer>
     </div>
   );
