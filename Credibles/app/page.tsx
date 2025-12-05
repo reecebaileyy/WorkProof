@@ -21,8 +21,7 @@ import NFTGallery from "./components/NFTGallery";
 import LandingPage from "./components/LandingPage";
 import Navbar from "./components/Navbar";
 import { getResumeWallet } from "./lib/baseAccount";
-// FIX: Use the frame-sdk (default import) which supports actions.ready()
-import sdk from '@farcaster/frame-sdk';
+import sdk from '@farcaster/miniapp-sdk';
 
 
 const CREDIBLES_V2_ABI = parseAbi([
