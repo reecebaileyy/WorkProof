@@ -34,6 +34,9 @@ contract CrediblesV2 is ERC721, Ownable {
     mapping(address => address) public userToResumeWallet; // main wallet => resume wallet (Base Account sub-account)
     mapping(address => address) public resumeWalletToUser; // resume wallet => main wallet
 
+    // ============ EAS Integration ============
+    address public attestationResolver; // EAS AttestationResolver contract address
+
     // ============ Token ID Management ============
     uint256 public nextSkillPetId = 1;
 
@@ -154,6 +157,31 @@ contract CrediblesV2 is ERC721, Ownable {
 
         uint256 tokenId = userToSkillPet[resumeWallet];
         _addXPInternal(tokenId, category, amount);
+    }
+
+    /**
+     * @dev Add XP to SkillPet via EAS AttestationResolver
+     * @param tokenId The SkillPet token ID
+     * @param category The skill category (dev, defi, gov, social)
+     * @param amount The amount of XP to add
+     * @notice Only callable by the AttestationResolver contract
+     */
+    function addXP(
+        uint256 tokenId,
+        string memory category,
+        uint256 amount
+    ) external {
+        require(msg.sender == attestationResolver, "Only AttestationResolver can call this");
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
+        _addXPInternal(tokenId, category, amount);
+    }
+
+    /**
+     * @dev Set the AttestationResolver address (only owner)
+     */
+    function setAttestationResolver(address _attestationResolver) external onlyOwner {
+        require(_attestationResolver != address(0), "Invalid address");
+        attestationResolver = _attestationResolver;
     }
 
     /**

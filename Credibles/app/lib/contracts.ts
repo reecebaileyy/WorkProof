@@ -2,7 +2,12 @@ import { Address } from "viem";
 
 // Contract addresses (will be populated after deployment)
 // These should be loaded from deployments.json or environment variables
+// Note: Use NEXT_PUBLIC_CREDIBLES_V2_CONTRACT_ADDRESS for CrediblesV2 (with all features)
+//       Use NEXT_PUBLIC_CREDIBLES_ADDRESS as fallback for simpler Credibles contract
 export const CONTRACT_ADDRESSES = {
+  CREDIBLES_V2: (process.env.NEXT_PUBLIC_CREDIBLES_V2_CONTRACT_ADDRESS || 
+                  process.env.NEXT_PUBLIC_CREDIBLES_ADDRESS || 
+                  "0x0000000000000000000000000000000000000000") as Address,
   CREDIBLES: (process.env.NEXT_PUBLIC_CREDIBLES_ADDRESS || "0x0000000000000000000000000000000000000000") as Address,
   ATTESTATION_RESOLVER: (process.env.NEXT_PUBLIC_ATTESTATION_RESOLVER_ADDRESS || "0x0000000000000000000000000000000000000000") as Address,
   PAYMENT_SPLITTER: (process.env.NEXT_PUBLIC_PAYMENT_SPLITTER_ADDRESS || "0x0000000000000000000000000000000000000000") as Address,
