@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { paymentMiddleware } from "x402-express";
+import { facilitator } from "@coinbase/x402";
 
 // Payment configuration
 const PAYMENT_CONFIG = {
   price: "5.00", // 5 USDC
   network: "base-sepolia",
   description: "Access Verified Talent Data",
-  recipient: process.env.WALLET_ADDRESS || process.env.NEXT_PUBLIC_WALLET_ADDRESS || "",
 };
-
-// USDC address on Base Sepolia
-const USDC_ADDRESS = process.env.NEXT_PUBLIC_USDC_ADDRESS || "0x036CbD53842c5426634e7929541eC2318f3dCF7e";
 
 // Mock verified users data (in production, this would come from a database)
 const MOCK_VERIFIED_USERS = [
@@ -71,6 +69,21 @@ const MOCK_VERIFIED_USERS = [
   },
 ];
 
+// Create x402 middleware
+const x402Gate = paymentMiddleware(
+  process.env.WALLET_ADDRESS || "", // Your wallet receives the funds
+  {
+    "/api/headhunter": {
+      price: PAYMENT_CONFIG.price,
+      network: PAYMENT_CONFIG.network,
+      config: {
+        description: PAYMENT_CONFIG.description,
+      },
+    },
+  },
+  facilitator // Uses Coinbase's hosted verifier automatically
+);
+
 /**
  * GET /api/headhunter
  * 
@@ -84,77 +97,61 @@ const MOCK_VERIFIED_USERS = [
  */
 export async function GET(request: NextRequest) {
   try {
-    // Check for payment proof in headers
-    const paymentProof = request.headers.get("X-Payment") || request.headers.get("x-payment");
-    
-    // If no payment proof or no recipient address configured, return 402 with payment details
-    if (!paymentProof || !PAYMENT_CONFIG.recipient) {
-      return NextResponse.json(
+    // Apply x402 payment middleware
+    // The middleware will handle payment verification and return 402 if needed
+    const response = await new Promise<NextResponse>((resolve) => {
+      x402Gate(
+        request as any,
         {
-          x402Version: 1,
-          error: "Payment Required",
-          accepts: [
-            {
-              scheme: "exact",
-              network: PAYMENT_CONFIG.network,
-              maxAmountRequired: (parseFloat(PAYMENT_CONFIG.price) * 1e6).toString(), // 5 USDC in smallest unit (6 decimals)
-              asset: USDC_ADDRESS,
-              payTo: PAYMENT_CONFIG.recipient || "0x0000000000000000000000000000000000000000",
-              resource: request.url,
-              description: PAYMENT_CONFIG.description,
-              mimeType: "application/json",
-              outputSchema: null,
-              maxTimeoutSeconds: 60,
-              extra: {
-                name: "USDC",
-                version: "2",
-              },
+          status: (code: number) => ({
+            json: (data: any) => {
+              resolve(NextResponse.json(data, { status: code }));
             },
-          ],
-        },
-        { status: 402 }
+            send: (data: any) => {
+              resolve(new NextResponse(data, { status: code }));
+            },
+          }),
+        } as any,
+        async () => {
+          // Payment verified - proceed with data retrieval
+          const { searchParams } = new URL(request.url);
+          const skillFilter = searchParams.get("skill");
+          const levelFilter = searchParams.get("level");
+
+          // Filter users based on query parameters
+          let filteredUsers = [...MOCK_VERIFIED_USERS];
+
+          if (skillFilter) {
+            filteredUsers = filteredUsers.filter(
+              (user) => user.category === skillFilter.toLowerCase()
+            );
+          }
+
+          if (levelFilter) {
+            const minLevel = parseInt(levelFilter, 10);
+            if (!isNaN(minLevel)) {
+              filteredUsers = filteredUsers.filter(
+                (user) => user.level >= minLevel
+              );
+            }
+          }
+
+          // Return filtered verified users
+          resolve(
+            NextResponse.json(
+              {
+                success: true,
+                count: filteredUsers.length,
+                users: filteredUsers,
+              },
+              { status: 200 }
+            )
+          );
+        }
       );
-    }
+    });
 
-    // TODO: Verify payment proof on-chain
-    // In production, you should:
-    // 1. Verify the transaction hash exists on Base Sepolia
-    // 2. Check the transaction is to the PaymentSplitter contract
-    // 3. Verify the amount is >= 5 USDC
-    // 4. Check the transaction is recent (within timeout)
-    // For now, if payment proof exists, allow access
-    
-    const { searchParams } = new URL(request.url);
-    const skillFilter = searchParams.get("skill");
-    const levelFilter = searchParams.get("level");
-
-    // Filter users based on query parameters
-    let filteredUsers = [...MOCK_VERIFIED_USERS];
-
-    if (skillFilter) {
-      filteredUsers = filteredUsers.filter(
-        (user) => user.category === skillFilter.toLowerCase()
-      );
-    }
-
-    if (levelFilter) {
-      const minLevel = parseInt(levelFilter, 10);
-      if (!isNaN(minLevel)) {
-        filteredUsers = filteredUsers.filter(
-          (user) => user.level >= minLevel
-        );
-      }
-    }
-
-    // Return filtered verified users
-    return NextResponse.json(
-      {
-        success: true,
-        count: filteredUsers.length,
-        users: filteredUsers,
-      },
-      { status: 200 }
-    );
+    return response;
   } catch (error) {
     console.error("Headhunter API error:", error);
     return NextResponse.json(

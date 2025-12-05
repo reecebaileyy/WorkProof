@@ -1,27 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Enable SWC minification for faster builds
-  swcMinify: true,
-  
-  // Optimize compilation
-  typescript: {
-    // Don't type check during build (faster, but less safe)
-    ignoreBuildErrors: false,
-  },
-  
   // Exclude blockchain folder from webpack processing
   webpack: (config, { isServer }) => {
-    // Optimize module resolution
-    config.resolve.symlinks = false;
-    
-    // Cache modules for faster rebuilds
-    config.cache = {
-      type: 'filesystem',
-      buildDependencies: {
-        config: [__filename],
-      },
-    };
     config.externals.push("pino-pretty", "lokijs", "encoding");
     
     // Ignore blockchain folder from watching - create new object to avoid read-only error
@@ -36,11 +17,6 @@ const nextConfig: NextConfig = {
       ignored: [
         ...existingIgnored.filter((item): item is string => typeof item === 'string' && item.length > 0),
         '**/blockchain/**',
-        '**/node_modules/**',
-        '**/.next/**',
-        '**/artifacts/**',
-        '**/typechain-types/**',
-        '**/cache/**',
       ],
     };
     

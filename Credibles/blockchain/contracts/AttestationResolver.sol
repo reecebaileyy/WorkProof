@@ -3,17 +3,20 @@ pragma solidity ^0.8.20;
 
 import "./IEAS.sol";
 import "./ISchemaRegistry.sol";
-import "./Credibles.sol";
 
 /**
  * @title AttestationResolver
- * @notice EAS SchemaResolver that processes attestations and updates Credibles NFTs
- * @dev When an attestation is created, this resolver decodes the data and calls Credibles.addXP
+ * @notice EAS SchemaResolver that processes attestations and updates CrediblesV2 NFTs
+ * @dev When an attestation is created, this resolver decodes the data and calls CrediblesV2.addXP
  */
+interface ICrediblesV2 {
+    function addXP(uint256 tokenId, string memory category, uint256 amount) external;
+}
+
 contract AttestationResolver {
     IEAS public immutable eas;
     ISchemaRegistry public immutable schemaRegistry;
-    Credibles public immutable credibles;
+    ICrediblesV2 public immutable credibles;
     bytes32 public schemaUID;
 
     /// @notice Emitted when an attestation is processed
@@ -28,7 +31,7 @@ contract AttestationResolver {
      * @notice Constructor
      * @param _eas The EAS contract address (Base Sepolia: 0x4200000000000000000000000000000000000021)
      * @param _schemaRegistry The SchemaRegistry contract address (Base Sepolia: 0x4200000000000000000000000000000000000020)
-     * @param _credibles The Credibles contract address
+     * @param _credibles The CrediblesV2 contract address
      */
     constructor(
         address _eas,
@@ -37,7 +40,7 @@ contract AttestationResolver {
     ) {
         eas = IEAS(_eas);
         schemaRegistry = ISchemaRegistry(_schemaRegistry);
-        credibles = Credibles(_credibles);
+        credibles = ICrediblesV2(_credibles);
 
         // Register schema: "uint256 studentId, string category, uint256 xpValue"
         schemaUID = schemaRegistry.register(
@@ -65,7 +68,7 @@ contract AttestationResolver {
             (uint256, string, uint256)
         );
 
-        // Call Credibles.addXP with the decoded data
+        // Call CrediblesV2.addXP with the decoded data
         // Note: studentId maps to tokenId in our system
         credibles.addXP(studentId, category, xpValue);
 

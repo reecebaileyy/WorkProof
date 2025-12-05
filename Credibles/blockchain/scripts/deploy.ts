@@ -17,13 +17,13 @@ async function main() {
   // Platform wallet address (update with actual address)
   const PLATFORM_WALLET = process.env.PLATFORM_WALLET || deployer.address;
 
-  // Deploy Credibles contract
-  console.log("\n1. Deploying Credibles contract...");
-  const Credibles = await ethers.getContractFactory("Credibles");
-  const credibles = await Credibles.deploy(deployer.address);
-  await credibles.waitForDeployment();
-  const crediblesAddress = await credibles.getAddress();
-  console.log("Credibles deployed to:", crediblesAddress);
+  // Deploy CrediblesV2 contract
+  console.log("\n1. Deploying CrediblesV2 contract...");
+  const CrediblesV2 = await ethers.getContractFactory("CrediblesV2");
+  const crediblesV2 = await CrediblesV2.deploy(deployer.address);
+  await crediblesV2.waitForDeployment();
+  const crediblesV2Address = await crediblesV2.getAddress();
+  console.log("CrediblesV2 deployed to:", crediblesV2Address);
 
   // Deploy AttestationResolver
   console.log("\n2. Deploying AttestationResolver...");
@@ -31,17 +31,17 @@ async function main() {
   const attestationResolver = await AttestationResolver.deploy(
     EAS_ADDRESS,
     SCHEMA_REGISTRY_ADDRESS,
-    crediblesAddress
+    crediblesV2Address
   );
   await attestationResolver.waitForDeployment();
   const resolverAddress = await attestationResolver.getAddress();
   console.log("AttestationResolver deployed to:", resolverAddress);
 
-  // Set AttestationResolver as authorized caller in Credibles
-  console.log("\n3. Setting AttestationResolver in Credibles...");
-  const setResolverTx = await credibles.setAttestationResolver(resolverAddress);
+  // Set AttestationResolver as authorized caller in CrediblesV2
+  console.log("\n3. Setting AttestationResolver in CrediblesV2...");
+  const setResolverTx = await crediblesV2.setAttestationResolver(resolverAddress);
   await setResolverTx.wait();
-  console.log("AttestationResolver set in Credibles");
+  console.log("AttestationResolver set in CrediblesV2");
 
   // Get schema UID from the resolver (it registers the schema in constructor)
   console.log("\n4. Getting schema UID from AttestationResolver...");
@@ -76,16 +76,16 @@ async function main() {
   if (process.env.BASESCAN_API_KEY) {
     console.log("\n6. Verifying contracts on BaseScan...");
     try {
-      console.log("Verifying Credibles...");
+      console.log("Verifying CrediblesV2...");
       await hre.run("verify:verify", {
-        address: crediblesAddress,
+        address: crediblesV2Address,
         constructorArguments: [deployer.address],
       });
       
       console.log("Verifying AttestationResolver...");
       await hre.run("verify:verify", {
         address: resolverAddress,
-        constructorArguments: [EAS_ADDRESS, SCHEMA_REGISTRY_ADDRESS, crediblesAddress],
+        constructorArguments: [EAS_ADDRESS, SCHEMA_REGISTRY_ADDRESS, crediblesV2Address],
       });
       
       console.log("Verifying PaymentSplitter...");
@@ -101,12 +101,13 @@ async function main() {
   }
 
   // Save deployment addresses to JSON file
+  const schema = "uint256 studentId, string category, uint256 xpValue";
   const deploymentInfo = {
     network: "baseSepolia",
     chainId: 84532,
     deployer: deployer.address,
     contracts: {
-      credibles: crediblesAddress,
+      crediblesV2: crediblesV2Address,
       attestationResolver: resolverAddress,
       paymentSplitter: splitterAddress,
     },
@@ -136,7 +137,7 @@ async function main() {
 
   console.log("\n✅ Deployment complete!");
   console.log("\nContract Addresses:");
-  console.log("  Credibles:", crediblesAddress);
+  console.log("  CrediblesV2:", crediblesV2Address);
   console.log("  AttestationResolver:", resolverAddress);
   console.log("  PaymentSplitter:", splitterAddress);
   console.log("  Schema UID:", schemaUID);
