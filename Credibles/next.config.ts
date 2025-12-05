@@ -75,8 +75,8 @@ const nextConfig: NextConfig = {
             value: 'unsafe-none',
           },
           {
-            key: 'X-Frame-Options',
-            value: 'SAMEORIGIN',
+            key: 'Content-Security-Policy',
+            value: "frame-ancestors 'self' https://*.farcaster.xyz https://*.base.org",
           },
         ],
       },
