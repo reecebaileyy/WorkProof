@@ -11,7 +11,7 @@ import SkillPetMint from "./components/SkillPetMint";
 import CreateAttestation from "./components/CreateAttestation";
 import NFTGallery from "./components/NFTGallery";
 import { getResumeWallet } from "./lib/baseAccount";
-import sdk from '@farcaster/miniapp-sdk';
+import { sdk } from '@farcaster/miniapp-sdk';
 
 
 const CREDIBLES_V2_ABI = parseAbi([
@@ -118,12 +118,10 @@ export default function Home() {
     // This console log will help you debug if the app is actually loading this far
     console.log("App mounted, calling sdk.actions.ready()...");
     
-    if (sdk && sdk.actions) {
         sdk.actions.ready();
         console.log("sdk.actions.ready() called!");
-    } else {
         console.error("SDK not initialized properly");
-    }
+
   }, []);
 
 
