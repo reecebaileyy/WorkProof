@@ -26,6 +26,9 @@ contract AttestationNFT is ERC721, Ownable {
     
     // Reference to CrediblesV2 for issuer verification
     address public crediblesV2Contract;
+    
+    // Reference to AttestationResolver for EAS minting
+    address public attestationResolver;
 
     // ============ Admin Management ============
     mapping(address => bool) public admins; // admin address => is admin
@@ -42,6 +45,7 @@ contract AttestationNFT is ERC721, Ownable {
         string title
     );
     event CrediblesV2ContractUpdated(address indexed oldContract, address indexed newContract);
+    event AttestationResolverUpdated(address indexed oldContract, address indexed newContract);
     event AdminAdded(address indexed admin);
     event AdminRemoved(address indexed admin);
 
@@ -88,6 +92,15 @@ contract AttestationNFT is ERC721, Ownable {
     }
 
     /**
+     * @dev Set the AttestationResolver contract address (for EAS minting)
+     */
+    function setAttestationResolver(address _attestationResolver) external onlyOwnerOrAdmin {
+        address oldContract = attestationResolver;
+        attestationResolver = _attestationResolver;
+        emit AttestationResolverUpdated(oldContract, _attestationResolver);
+    }
+
+    /**
      * @dev Check if an address is a verified issuer (via CrediblesV2)
      */
     function isVerifiedIssuer(address issuer) public view returns (bool) {
@@ -123,13 +136,46 @@ contract AttestationNFT is ERC721, Ownable {
         require(bytes(category).length > 0, "Category cannot be empty");
         require(bytes(title).length > 0, "Title cannot be empty");
 
+        _mintAttestationNFT(recipient, msg.sender, category, title, issuerInfo);
+    }
+
+    /**
+     * @dev Create and mint attestation NFT from AttestationResolver (EAS flow)
+     * Only callable by AttestationResolver on behalf of verified issuers
+     */
+    function createAttestationNFTFromEAS(
+        address recipient,
+        address issuer,
+        string memory category,
+        string memory title,
+        string memory issuerInfo
+    ) external {
+        require(msg.sender == attestationResolver, "Only AttestationResolver can call this");
+        require(isVerifiedIssuer(issuer), "Issuer not verified");
+        require(recipient != address(0), "Invalid recipient");
+        require(bytes(category).length > 0, "Category cannot be empty");
+        require(bytes(title).length > 0, "Title cannot be empty");
+
+        _mintAttestationNFT(recipient, issuer, category, title, issuerInfo);
+    }
+
+    /**
+     * @dev Internal function to mint attestation NFT
+     */
+    function _mintAttestationNFT(
+        address recipient,
+        address issuer,
+        string memory category,
+        string memory title,
+        string memory issuerInfo
+    ) internal {
         uint256 tokenId = nextTokenId;
         nextTokenId++;
 
         _mint(recipient, tokenId);
 
         attestationData[tokenId] = AttestationData({
-            issuer: msg.sender,
+            issuer: issuer,
             category: category,
             timestamp: block.timestamp,
             issuerInfo: issuerInfo,
@@ -138,7 +184,7 @@ contract AttestationNFT is ERC721, Ownable {
 
         userAttestations[recipient].push(tokenId);
 
-        emit AttestationNFTMinted(recipient, msg.sender, tokenId, category, title);
+        emit AttestationNFTMinted(recipient, issuer, tokenId, category, title);
     }
 
     /**

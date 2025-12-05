@@ -25,27 +25,45 @@ async function main() {
   const crediblesV2Address = await crediblesV2.getAddress();
   console.log("CrediblesV2 deployed to:", crediblesV2Address);
 
+  // Deploy AttestationNFT first (needed for AttestationResolver)
+  console.log("\n2. Deploying AttestationNFT...");
+  const AttestationNFT = await ethers.getContractFactory("AttestationNFT");
+  const attestationNFT = await AttestationNFT.deploy(
+    deployer.address,
+    crediblesV2Address
+  );
+  await attestationNFT.waitForDeployment();
+  const attestationNFTAddress = await attestationNFT.getAddress();
+  console.log("AttestationNFT deployed to:", attestationNFTAddress);
+
   // Deploy AttestationResolver
-  console.log("\n2. Deploying AttestationResolver...");
+  console.log("\n3. Deploying AttestationResolver...");
   const AttestationResolver = await ethers.getContractFactory("AttestationResolver");
   const attestationResolver = await AttestationResolver.deploy(
     EAS_ADDRESS,
     SCHEMA_REGISTRY_ADDRESS,
     crediblesV2Address,
+    attestationNFTAddress,
     deployer.address
   );
   await attestationResolver.waitForDeployment();
   const resolverAddress = await attestationResolver.getAddress();
   console.log("AttestationResolver deployed to:", resolverAddress);
+  
+  // Set AttestationResolver in AttestationNFT
+  console.log("\n4. Setting AttestationResolver in AttestationNFT...");
+  const setResolverTx = await attestationNFT.setAttestationResolver(resolverAddress);
+  await setResolverTx.wait();
+  console.log("AttestationResolver set in AttestationNFT");
 
   // Set AttestationResolver as authorized caller in CrediblesV2
-  console.log("\n3. Setting AttestationResolver in CrediblesV2...");
-  const setResolverTx = await crediblesV2.setAttestationResolver(resolverAddress);
-  await setResolverTx.wait();
+  console.log("\n5. Setting AttestationResolver in CrediblesV2...");
+  const setResolverInCrediblesTx = await crediblesV2.setAttestationResolver(resolverAddress);
+  await setResolverInCrediblesTx.wait();
   console.log("AttestationResolver set in CrediblesV2");
 
   // Get schema UID from the resolver (it registers the schema in constructor)
-  console.log("\n4. Getting schema UID from AttestationResolver...");
+  console.log("\n6. Getting schema UID from AttestationResolver...");
   await attestationResolver.waitForDeployment();
   
   // Wait a bit for the contract to be fully deployed
@@ -61,19 +79,8 @@ async function main() {
     console.warn("Schema UID could not be automatically retrieved. Please check the contract on BaseScan.");
   }
 
-  // Deploy AttestationNFT
-  console.log("\n5. Deploying AttestationNFT...");
-  const AttestationNFT = await ethers.getContractFactory("AttestationNFT");
-  const attestationNFT = await AttestationNFT.deploy(
-    deployer.address,
-    crediblesV2Address
-  );
-  await attestationNFT.waitForDeployment();
-  const attestationNFTAddress = await attestationNFT.getAddress();
-  console.log("AttestationNFT deployed to:", attestationNFTAddress);
-
   // Deploy PaymentSplitter
-  console.log("\n6. Deploying PaymentSplitter...");
+  console.log("\n7. Deploying PaymentSplitter...");
   const PaymentSplitter = await ethers.getContractFactory("PaymentSplitter");
   const paymentSplitter = await PaymentSplitter.deploy(
     USDC_ADDRESS,
@@ -86,7 +93,7 @@ async function main() {
 
   // Verify contracts on BaseScan (if API key is set)
   if (process.env.BASESCAN_API_KEY) {
-    console.log("\n7. Verifying contracts on BaseScan...");
+    console.log("\n8. Verifying contracts on BaseScan...");
     try {
       console.log("Verifying CrediblesV2...");
       await hre.run("verify:verify", {
@@ -94,16 +101,16 @@ async function main() {
         constructorArguments: [deployer.address],
       });
       
-      console.log("Verifying AttestationResolver...");
-      await hre.run("verify:verify", {
-        address: resolverAddress,
-        constructorArguments: [EAS_ADDRESS, SCHEMA_REGISTRY_ADDRESS, crediblesV2Address, deployer.address],
-      });
-      
       console.log("Verifying AttestationNFT...");
       await hre.run("verify:verify", {
         address: attestationNFTAddress,
         constructorArguments: [deployer.address, crediblesV2Address],
+      });
+      
+      console.log("Verifying AttestationResolver...");
+      await hre.run("verify:verify", {
+        address: resolverAddress,
+        constructorArguments: [EAS_ADDRESS, SCHEMA_REGISTRY_ADDRESS, crediblesV2Address, attestationNFTAddress, deployer.address],
       });
       
       console.log("Verifying PaymentSplitter...");
@@ -115,11 +122,11 @@ async function main() {
       console.log("Verification failed (contracts may already be verified):", error);
     }
   } else {
-    console.log("\n7. Skipping verification (BASESCAN_API_KEY not set)");
+    console.log("\n8. Skipping verification (BASESCAN_API_KEY not set)");
   }
 
   // Save deployment addresses to JSON file
-  const schema = "uint256 studentId, string category, uint256 xpValue";
+  const schema = "uint256 studentId, string category, uint256 xpValue, string title, string issuerInfo";
   const deploymentInfo = {
     network: "baseSepolia",
     chainId: 84532,
@@ -143,7 +150,7 @@ async function main() {
 
   const outputPath = path.join(__dirname, "../deployments.json");
   fs.writeFileSync(outputPath, JSON.stringify(deploymentInfo, null, 2));
-  console.log("\n8. Deployment info saved to:", outputPath);
+  console.log("\n9. Deployment info saved to:", outputPath);
 
   // Also save to app/lib for frontend access
   const appLibPath = path.join(__dirname, "../../app/lib/deployments.json");
