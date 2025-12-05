@@ -6,7 +6,7 @@
     "compile": "hardhat compile",
     "test": "hardhat test",
     "deploy": "hardhat run scripts/deploy.ts --network baseSepolia",
-    "verify": "hardhat verify --network baseSepolia"
+    "verify": "npx hardhat verify --network baseSepolia 0xDDE505c6651160Cbc579770bfbbFf68d8C818551 '0x4200000000000000000000000000000000000021' '0x4200000000000000000000000000000000000020' '0x7792cf54F8c8Fce14f9d720245daC20182BecEeD'"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
