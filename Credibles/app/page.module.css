@@ -671,6 +671,36 @@
   cursor: not-allowed;
 }
 
+.backButton {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+@media (prefers-color-scheme: light) {
+  .backButton {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #171717;
+  }
+}
+
+.backButton:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+@media (prefers-color-scheme: light) {
+  .backButton:hover {
+    background: rgba(0, 0, 0, 0.08);
+  }
+}
+
 @media (prefers-color-scheme: light) {
   .modalOverlay {
     background: rgba(0, 0, 0, 0.5);

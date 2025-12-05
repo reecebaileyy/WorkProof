@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@base-org/account": "^2.5.0",
     "@coinbase/onchainkit": "latest",
     "@coinbase/x402": "^0.7.3",
     "@tanstack/react-query": "^5.81.5",

@@ -1,0 +1,187 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+}
+
+.container h2 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.section {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .section {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.section h3 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+}
+
+.skillPetCard {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .skillPetCard {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.nftHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tokenId {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@media (prefers-color-scheme: light) {
+  .tokenId {
+    color: rgba(0, 0, 0, 0.9);
+  }
+}
+
+.evolution {
+  background: rgba(0, 255, 0, 0.2);
+  color: #00ff00;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+}
+
+.stat {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+@media (prefers-color-scheme: light) {
+  .stat {
+    background: rgba(0, 0, 0, 0.02);
+    color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+.stat strong {
+  color: #00ff00;
+}
+
+.attestationGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.attestationCard {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: transform 0.2s;
+}
+
+@media (prefers-color-scheme: light) {
+  .attestationCard {
+    background: rgba(0, 0, 0, 0.02);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.attestationCard:hover {
+  transform: translateY(-2px);
+  border-color: #0052ff;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.category {
+  background: rgba(0, 82, 255, 0.2);
+  color: #0052ff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.attestationTitle {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+@media (prefers-color-scheme: light) {
+  .attestationTitle {
+    color: rgba(0, 0, 0, 0.95);
+  }
+}
+
+.cardBody p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: light) {
+  .cardBody p {
+    color: rgba(0, 0, 0, 0.8);
+  }
+}
+
+.cardBody strong {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@media (prefers-color-scheme: light) {
+  .cardBody strong {
+    color: rgba(0, 0, 0, 0.9);
+  }
+}
+

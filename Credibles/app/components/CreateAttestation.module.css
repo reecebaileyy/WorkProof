@@ -1,0 +1,183 @@
+.container {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+@media (prefers-color-scheme: light) {
+  .container {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+  }
+}
+
+.container h2 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1.75rem;
+}
+
+.description {
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 2rem;
+  line-height: 1.6;
+}
+
+@media (prefers-color-scheme: light) {
+  .description {
+    color: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.warning {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 170, 0, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 170, 0, 0.3);
+}
+
+.warning h3 {
+  color: #ffaa00;
+  margin-top: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.inputGroup label {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+@media (prefers-color-scheme: light) {
+  .inputGroup label {
+    color: rgba(0, 0, 0, 0.9);
+  }
+}
+
+.inputGroup input,
+.inputGroup select,
+.inputGroup textarea {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: white;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.2s;
+}
+
+@media (prefers-color-scheme: light) {
+  .inputGroup input,
+  .inputGroup select,
+  .inputGroup textarea {
+    background: rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    color: #000;
+  }
+}
+
+.inputGroup input:focus,
+.inputGroup select:focus,
+.inputGroup textarea:focus {
+  outline: none;
+  border-color: #0052ff;
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 82, 255, 0.1);
+}
+
+@media (prefers-color-scheme: light) {
+  .inputGroup input:focus,
+  .inputGroup select:focus,
+  .inputGroup textarea:focus {
+    background: rgba(0, 0, 0, 0.08);
+  }
+}
+
+.inputGroup textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.hint {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+@media (prefers-color-scheme: light) {
+  .hint {
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.submitButton {
+  background: linear-gradient(90deg, #0052ff, #0066ff);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.submitButton:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.submitButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  color: #ff4444;
+  margin: 0;
+  padding: 0.75rem;
+  background: rgba(255, 68, 68, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+}
+
+.success {
+  color: #00ff00;
+  margin: 0;
+  padding: 0.75rem;
+  background: rgba(0, 255, 0, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(0, 255, 0, 0.3);
+}
+
+.txHash {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin: 0;
+}
+
+@media (prefers-color-scheme: light) {
+  .txHash {
+    color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.txHash a {
+  color: #0052ff;
+  text-decoration: underline;
+}
+

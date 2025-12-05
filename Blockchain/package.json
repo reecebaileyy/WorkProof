@@ -6,10 +6,12 @@
   "scripts": {
     "test": "npx hardhat test",
     "deploy": "npx hardhat run scripts/deploy.ts --network baseSepolia",
+    "deploy-v2": "npx hardhat run scripts/deploy-v2.ts --network baseSepolia",
     "deployments": "npx hardhat run scripts/list-deployments.ts",
     "verify": "npx hardhat run scripts/verify-contracts.ts",
     "test-backend": "npx hardhat run scripts/test-backend.ts",
-    "update-frontend": "npx hardhat run scripts/update-frontend-env.ts"
+    "update-frontend": "npx hardhat run scripts/update-frontend-env.ts",
+    "migrate": "npx hardhat run scripts/migrate.ts --network baseSepolia"
   },
   "keywords": [],
   "author": "",
