@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createPublicClient, http, parseAbi, encodeFunctionData, decodeEventLog, getContract } from "viem";
+import { createPublicClient, http, parseAbi, parseAbiItem, encodeFunctionData, decodeEventLog, getContract } from "viem";
 import { baseSepolia } from "viem/chains";
 
 // Contract ABIs
@@ -67,7 +67,7 @@ async function discoverSkillPetCandidates(
     // Get SkillPetMinted events
     const logs = await publicClient.getLogs({
       address: crediblesV2Address,
-      event: parseAbi(["event SkillPetMinted(address indexed user, address indexed resumeWallet, uint256 indexed tokenId)"]),
+      event: parseAbiItem("event SkillPetMinted(address indexed user, address indexed resumeWallet, uint256 indexed tokenId)"),
       fromBlock: "earliest",
     });
 
@@ -87,7 +87,7 @@ async function discoverSkillPetCandidates(
     }
 
     // Batch read skillPetStats using multicall
-    const contract = getContract({
+    const _contract = getContract({
       address: crediblesV2Address,
       abi: CREDIBLES_V2_ABI,
       client: publicClient,
@@ -159,7 +159,7 @@ async function discoverAttestationCandidates(
             candidates.add(decoded.args.recipient);
           }
         }
-      } catch (decodeError) {
+      } catch {
         // Skip logs that can't be decoded
         continue;
       }

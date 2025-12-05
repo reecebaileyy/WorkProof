@@ -5,7 +5,7 @@ import { facilitator } from "@coinbase/x402";
 // Payment configuration
 const PAYMENT_CONFIG = {
   price: "5.00", // 5 USDC
-  network: "base-sepolia",
+  network: "base-sepolia" as const,
   description: "Access Verified Talent Data",
 };
 
@@ -71,7 +71,7 @@ const MOCK_VERIFIED_USERS = [
 
 // Create x402 middleware
 const x402Gate = paymentMiddleware(
-  process.env.WALLET_ADDRESS || "", // Your wallet receives the funds
+  (process.env.WALLET_ADDRESS || "") as `0x${string}`, // Your wallet receives the funds
   {
     "/api/headhunter": {
       price: PAYMENT_CONFIG.price,
@@ -99,18 +99,24 @@ export async function GET(request: NextRequest) {
   try {
     // Apply x402 payment middleware
     // The middleware will handle payment verification and return 402 if needed
+    // Note: x402-express middleware has incomplete TypeScript types
     const response = await new Promise<NextResponse>((resolve) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       x402Gate(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         request as any,
         {
           status: (code: number) => ({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             json: (data: any) => {
               resolve(NextResponse.json(data, { status: code }));
             },
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             send: (data: any) => {
               resolve(new NextResponse(data, { status: code }));
             },
           }),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } as any,
         async () => {
           // Payment verified - proceed with data retrieval

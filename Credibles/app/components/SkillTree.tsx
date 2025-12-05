@@ -58,7 +58,6 @@ function calculateLevel(xp: bigint): number {
 }
 
 function calculateProgress(xp: bigint): number {
-  const level = calculateLevel(xp);
   const xpInCurrentLevel = Number(xp) % 100;
   return xpInCurrentLevel;
 }

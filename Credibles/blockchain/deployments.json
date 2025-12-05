@@ -1,0 +1,19 @@
+{
+  "network": "baseSepolia",
+  "chainId": 84532,
+  "deployer": "0x41b1e204e9c15fF5894bd47C6Dc3a7Fa98C775C7",
+  "contracts": {
+    "crediblesV2": "0x7792cf54F8c8Fce14f9d720245daC20182BecEeD",
+    "attestationResolver": "0xDDE505c6651160Cbc579770bfbbFf68d8C818551",
+    "paymentSplitter": "0x0c7a8d9776cCCfD051752a69731c99599F7d8c7e"
+  },
+  "eas": {
+    "easAddress": "0x4200000000000000000000000000000000000021",
+    "schemaRegistryAddress": "0x4200000000000000000000000000000000000020",
+    "schemaUID": "0xf1fe50c7060f9942219d706f3bf5ada26bde9fa72a3c773b43c68d1d0e16160f",
+    "schema": "uint256 studentId, string category, uint256 xpValue"
+  },
+  "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+  "platformWallet": "0x41b1e204e9c15ff5894bd47c6dc3a7fa98c775c7",
+  "deployedAt": "2025-12-05T08:22:14.629Z"
+}
