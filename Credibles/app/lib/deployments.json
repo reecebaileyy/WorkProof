@@ -3,18 +3,18 @@
   "chainId": 84532,
   "deployer": "0x41b1e204e9c15fF5894bd47C6Dc3a7Fa98C775C7",
   "contracts": {
-    "crediblesV2": "0x95Ae3EE9F9d5218C835727C5274087872EB95F40",
-    "attestationResolver": "0x4D323446f2cdF45C65b8E84dA3284Cd36b421207",
-    "attestationNFT": "0x69232Bf1Fed4fa368af459dD39C33C51a81AE0f7",
-    "paymentSplitter": "0x6AC893F609b6a7c7f659Fc32F7dD6CcA98E7d2e0"
+    "crediblesV2": "0x0e616e682753e307c6c3F24e921164f46F63e4D5",
+    "attestationResolver": "0xef7434F795F4dDe959C66C8847f0EaF8bf812994",
+    "attestationNFT": "0xcFE4F8585Ac6196860A8EAF0014c10d05dBAFb7b",
+    "paymentSplitter": "0xf20B76c32D36458Bb5DF39012B5fc086b2937a6E"
   },
   "eas": {
     "easAddress": "0x4200000000000000000000000000000000000021",
     "schemaRegistryAddress": "0x4200000000000000000000000000000000000020",
-    "schemaUID": "0x7658e56ea907ce9accee1fe2cf5b7439e034cfc4677a077e46bcdb1f77c68981",
+    "schemaUID": "0xbb10912e30b90ab17846f98854f7848c4a04e38637c4db0301cbb49bb39e52e1",
     "schema": "uint256 studentId, string category, uint256 xpValue, string title, string issuerInfo"
   },
   "usdc": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
   "platformWallet": "0x41b1e204e9c15fF5894bd47C6Dc3a7Fa98C775C7",
-  "deployedAt": "2025-12-05T10:56:05.848Z"
+  "deployedAt": "2025-12-05T20:51:25.543Z"
 }
