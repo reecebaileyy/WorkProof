@@ -114,9 +114,6 @@ export default function Home() {
     },
   });
 
-  // -------------------------------------------------------------------------
-  // CRITICAL: SDK Ready Call
-  // -------------------------------------------------------------------------
   useEffect(() => {
     // This console log will help you debug if the app is actually loading this far
     console.log("App mounted, calling sdk.actions.ready()...");
@@ -128,6 +125,8 @@ export default function Home() {
         console.error("SDK not initialized properly");
     }
   }, []);
+
+
   // -------------------------------------------------------------------------
 
   // Set resume wallet when registered
