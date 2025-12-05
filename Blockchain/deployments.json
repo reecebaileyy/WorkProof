@@ -67,5 +67,23 @@
         "txHash": "0xea104b3e1c685aa7a5769caf4f8365342f3c1c472d3dcaaa009d2210e193a3c8"
       }
     ]
+  },
+  {
+    "network": "base-sepolia",
+    "timestamp": "2025-12-05T07:14:13.739Z",
+    "owner": "0x41b1e204e9c15fF5894bd47C6Dc3a7Fa98C775C7",
+    "contracts": [
+      {
+        "name": "Credibles",
+        "address": "0x41020720e356b0fde0dd63b02d1ffd3a2b6acc20",
+        "txHash": "0x1d23f48017a8d18aeeddff18c3c9f4b3b5bdfb682a560042f31e3ce1f086b139"
+      },
+      {
+        "name": "AttestationResolver",
+        "address": "0x4afb9df3aa5367caddd51ebb6f6d3ffd283e601a",
+        "txHash": "0x7dd188e59485609a6bcdbb99271cd4192c8465deb2a28132520bb675b5580117"
+      }
+    ],
+    "schemaUID": "0x7b2dd5786ffdab4e2529efe9b66f271fe226d1b16cee998b5169f7fbc1a7ad06"
   }
 ]
