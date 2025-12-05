@@ -532,7 +532,7 @@ export default function Home() {
   const titleStyle: React.CSSProperties = {
     fontSize: 48,
     fontWeight: 800,
-    background: "linear-gradient(135deg, #fff 0%, #94a3b8 100%)",
+    background: "var(--accent-gradient)",
     WebkitBackgroundClip: "text",
     WebkitTextFillColor: "transparent",
     marginBottom: 8,
@@ -541,14 +541,14 @@ export default function Home() {
 
   const subtitleStyle: React.CSSProperties = {
     fontSize: 18,
-    color: "#94a3b8",
+    color: "color-mix(in srgb, var(--foreground), transparent 40%)",
     fontWeight: 500,
   };
 
   const sectionTitleStyle: React.CSSProperties = {
     fontSize: 28,
     fontWeight: 700,
-    color: "#fff",
+    color: "var(--foreground)",
     marginBottom: 24,
     display: "flex",
     alignItems: "center",
@@ -584,7 +584,7 @@ export default function Home() {
               >
                 Choose Your Path
               </h1>
-              <p style={{ fontSize: 20, color: "#94a3b8" }}>
+              <p style={{ fontSize: 20, color: "color-mix(in srgb, var(--foreground), transparent 40%)" }}>
                 Select how you want to interact with Credibles
               </p>
             </header>
@@ -592,8 +592,8 @@ export default function Home() {
               {!isConnected ? (
                 <div
                   style={{
-                    background: "rgba(255, 255, 255, 0.03)",
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    background: "var(--card-bg)",
+                    border: "1px solid var(--card-border)",
                     borderRadius: 24,
                     padding: 48,
                     backdropFilter: "blur(20px)",
@@ -603,7 +603,7 @@ export default function Home() {
                     style={{
                       fontSize: 20,
                       marginBottom: 32,
-                      color: "#e2e8f0",
+                      color: "var(--foreground)",
                       fontWeight: 500,
                     }}
                   >
@@ -636,9 +636,9 @@ export default function Home() {
           <button
             onClick={() => setUserType(null)}
             style={{
-              background: "rgba(255, 255, 255, 0.05)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              color: "#fff",
+              background: "rgba(128, 128, 128, 0.1)",
+              border: "1px solid var(--card-border)",
+              color: "var(--foreground)",
               padding: "10px 20px",
               borderRadius: 999,
               cursor: "pointer",
@@ -647,10 +647,10 @@ export default function Home() {
               transition: "all 0.2s",
             }}
             onMouseEnter={(e) =>
-              (e.currentTarget.style.background = "rgba(255, 255, 255, 0.1)")
+              (e.currentTarget.style.background = "rgba(128, 128, 128, 0.2)")
             }
             onMouseLeave={(e) =>
-              (e.currentTarget.style.background = "rgba(255, 255, 255, 0.05)")
+              (e.currentTarget.style.background = "rgba(128, 128, 128, 0.1)")
             }
           >
             ← Change Role
@@ -774,15 +774,15 @@ export default function Home() {
                           <h2 style={sectionTitleStyle}>
                             <span style={{ fontSize: 32 }}>🌳</span> Skill Tree
                           </h2>
-                          <p style={{ fontSize: 16, color: "#94a3b8" }}>
+                          <p style={{ fontSize: 16, color: "color-mix(in srgb, var(--foreground), transparent 40%)" }}>
                             Track your progress and evolve your SkillPet
                           </p>
                         </div>
 
                         <div
                           style={{
-                            background: "rgba(255, 255, 255, 0.03)",
-                            border: "1px solid rgba(255, 255, 255, 0.08)",
+                            background: "var(--card-bg)",
+                            border: "1px solid var(--card-border)",
                             borderRadius: 20,
                             padding: "16px 24px",
                             display: "flex",
@@ -801,7 +801,7 @@ export default function Home() {
                             <span
                               style={{
                                 fontSize: 11,
-                                color: "#94a3b8",
+                                color: "color-mix(in srgb, var(--foreground), transparent 40%)",
                                 fontWeight: 700,
                                 textTransform: "uppercase",
                                 letterSpacing: "0.05em",
@@ -827,7 +827,7 @@ export default function Home() {
                             style={{
                               width: 1,
                               height: 32,
-                              background: "rgba(255, 255, 255, 0.1)",
+                              background: "var(--card-border)",
                             }}
                           />
                           <div
@@ -840,7 +840,7 @@ export default function Home() {
                             <span
                               style={{
                                 fontSize: 11,
-                                color: "#94a3b8",
+                                color: "color-mix(in srgb, var(--foreground), transparent 40%)",
                                 fontWeight: 700,
                                 textTransform: "uppercase",
                                 letterSpacing: "0.05em",
@@ -853,7 +853,7 @@ export default function Home() {
                               style={{
                                 fontSize: 20,
                                 fontWeight: 700,
-                                color: "#fff",
+                                color: "var(--foreground)",
                                 fontFamily:
                                   "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
                               }}

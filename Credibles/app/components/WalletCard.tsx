@@ -25,13 +25,13 @@ export default function WalletCard({
     position: "relative",
     borderRadius: 24,
     padding: 24,
-    background: "rgba(255, 255, 255, 0.03)",
-    border: "1px solid rgba(255, 255, 255, 0.08)",
+    background: "var(--card-bg)",
+    border: "1px solid var(--card-border)",
     backdropFilter: "blur(20px)",
     WebkitBackdropFilter: "blur(20px)",
     boxShadow: isHovered
-      ? "0 20px 40px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1)"
-      : "0 10px 30px rgba(0, 0, 0, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.05)",
+      ? "0 12px 40px rgba(0, 0, 0, 0.15)"
+      : "var(--glass-shadow)",
     transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
     transform: isHovered ? "translateY(-4px)" : "translateY(0)",
     overflow: "hidden",
@@ -60,7 +60,7 @@ export default function WalletCard({
 
   const networkLabelStyle: React.CSSProperties = {
     fontSize: 13,
-    color: "rgba(255, 255, 255, 0.5)",
+    color: "color-mix(in srgb, var(--foreground), transparent 50%)",
     fontWeight: 500,
   };
 
@@ -87,10 +87,10 @@ export default function WalletCard({
     display: "flex",
     alignItems: "center",
     gap: 16,
-    background: "rgba(0, 0, 0, 0.2)",
+    background: "rgba(128, 128, 128, 0.1)",
     padding: 16,
     borderRadius: 16,
-    border: "1px solid rgba(255, 255, 255, 0.05)",
+    border: "1px solid var(--card-border)",
   };
 
   const avatarStyle: React.CSSProperties = {
@@ -112,14 +112,14 @@ export default function WalletCard({
     fontFamily:
       "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
     fontSize: 15,
-    color: "#FFFFFF",
+    color: "var(--foreground)",
     fontWeight: 600,
     letterSpacing: "-0.02em",
   };
 
   const fullAddressStyle: React.CSSProperties = {
     fontSize: 11,
-    color: "rgba(255, 255, 255, 0.4)",
+    color: "color-mix(in srgb, var(--foreground), transparent 60%)",
     marginTop: 4,
     fontFamily:
       "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
@@ -132,7 +132,7 @@ export default function WalletCard({
     justifyContent: "space-between",
     alignItems: "center",
     paddingTop: 16,
-    borderTop: "1px solid rgba(255, 255, 255, 0.05)",
+    borderTop: "1px solid var(--card-border)",
   };
 
   const linkStyle: React.CSSProperties = {
@@ -149,7 +149,7 @@ export default function WalletCard({
 
   const copyHintStyle: React.CSSProperties = {
     fontSize: 12,
-    color: "rgba(255, 255, 255, 0.4)",
+    color: "color-mix(in srgb, var(--foreground), transparent 60%)",
     fontStyle: "italic",
   };
 
