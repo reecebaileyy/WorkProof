@@ -11,8 +11,6 @@ import SkillPetMint from "./components/SkillPetMint";
 import CreateAttestation from "./components/CreateAttestation";
 import NFTGallery from "./components/NFTGallery";
 import { getResumeWallet } from "./lib/baseAccount";
-import { sdk } from '@farcaster/miniapp-sdk';
-
 
 const CREDIBLES_V2_ABI = parseAbi([
   "function hasSkillPet(address) view returns (bool)",
@@ -113,17 +111,6 @@ export default function Home() {
       enabled: isConnected && !!address && userType === "issuer" && !!crediblesV2Address,
     },
   });
-
-  useEffect(() => {
-    // This console log will help you debug if the app is actually loading this far
-    console.log("App mounted, calling sdk.actions.ready()...");
-    
-        sdk.actions.ready();
-        console.log("sdk.actions.ready() called!");
-        console.error("SDK not initialized properly");
-
-  }, []);
-
 
   // -------------------------------------------------------------------------
 

@@ -7,10 +7,21 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@coinbase/onchainkit/styles.css';
 import { initializeBaseAccountSDK } from './lib/baseAccount';
 import { config } from '../wagmi'; 
+import { sdk } from '@farcaster/miniapp-sdk';
+
 
 const queryClient = new QueryClient();
 
 export function RootProvider({ children }: { children: ReactNode }) {
+  useEffect(() => {
+    // This console log will help you debug if the app is actually loading this far
+    console.log("App mounted, calling sdk.actions.ready()...");
+    
+        sdk.actions.ready();
+        console.log("sdk.actions.ready() called!");
+
+  }, []);
+
   useEffect(() => {
     // Initialize Base specific logic
     initializeBaseAccountSDK();
