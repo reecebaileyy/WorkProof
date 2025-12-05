@@ -1,31 +1,38 @@
 'use client';
-import { ReactNode, useEffect } from 'react';
-import { baseSepolia } from 'viem/chains';
+import { ReactNode, useEffect, useState } from 'react';
+import { baseSepolia } from 'wagmi/chains';
 import { OnchainKitProvider } from '@coinbase/onchainkit';
+import { WagmiProvider } from 'wagmi';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import '@coinbase/onchainkit/styles.css';
 import { initializeBaseAccountSDK } from './lib/baseAccount';
+import { config } from '../wagmi'; // Import the config we made in Step 1
 
 export function RootProvider({ children }: { children: ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
   useEffect(() => {
-    // Initialize Base Account SDK on mount
     initializeBaseAccountSDK();
   }, []);
 
   return (
-    <OnchainKitProvider
-      apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY || "manually set in rootProvider.tsx i was having issues with the .env file"}
-      chain={baseSepolia}
-      rpcUrl={process.env.NEXT_PUBLIC_RPC_URL || "https://sepolia.base.org"}
-      config={{
-        appearance: {
-          mode: 'auto',
-        },
-        wallet: {
-          display: 'modal',
-        },
-      }}
-    >
-      {children}
-    </OnchainKitProvider>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={queryClient}>
+        <OnchainKitProvider
+          apiKey={process.env.NEXT_PUBLIC_ONCHAINKIT_API_KEY || ""}
+          chain={baseSepolia}
+          config={{
+            appearance: {
+              mode: 'auto',
+            },
+            wallet: {
+              display: 'modal',
+            },
+          }}
+        >
+          {children}
+        </OnchainKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from "wagmi";
+import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract, useChainId, useSwitchChain } from "wagmi";
 import { parseAbi } from "viem";
 import { baseSepolia } from "wagmi/chains";
 import { getResumeWallet, createResumeWallet } from "../lib/baseAccount";
@@ -21,6 +21,8 @@ interface SkillPetMintProps {
 
 export default function SkillPetMint({ contractAddress, onMintComplete }: SkillPetMintProps) {
   const { address, isConnected } = useAccount();
+  const chainId = useChainId();
+  const { switchChainAsync, isPending: isSwitchingChain } = useSwitchChain();
   const [resumeWallet, setResumeWallet] = useState<string | null>(null);
   const [isCreatingWallet, setIsCreatingWallet] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -62,28 +64,26 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
 
   // Get or create resume wallet
   useEffect(() => {
-    if (!isConnected || !address) return;
+    if (!isConnected || !address || chainId !== baseSepolia.id) return;
 
     const setupResumeWallet = async () => {
-      // First check if already registered
+      // First check if already registered on-chain
       if (registeredWallet && registeredWallet !== "0x0000000000000000000000000000000000000000") {
         setResumeWallet(registeredWallet);
         return;
       }
 
-      // Try to get existing sub-account
+      // Try to get existing sub-account from Base Account SDK
       const existingWallet = await getResumeWallet();
       if (existingWallet) {
         setResumeWallet(existingWallet);
-        // Register it if not already registered
-        if (!registeredWallet) {
-          registerResumeWallet(existingWallet);
-        }
+        // Don't auto-register - let user click button to register
+        // This prevents the "already registered" error
       }
     };
 
     setupResumeWallet();
-  }, [isConnected, address, registeredWallet]);
+  }, [isConnected, address, registeredWallet, chainId]);
 
   const createWallet = async () => {
     if (!isConnected || !address) {
@@ -91,15 +91,40 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
       return;
     }
 
+    // Ensure we're on Base Sepolia
+    if (chainId !== baseSepolia.id && switchChainAsync) {
+      try {
+        await switchChainAsync({ chainId: baseSepolia.id });
+      } catch (err: any) {
+        setError("Please switch to Base Sepolia network");
+        return;
+      }
+    }
+
+    // Check if already registered before creating
+    if (registeredWallet && registeredWallet !== "0x0000000000000000000000000000000000000000") {
+      setResumeWallet(registeredWallet);
+      return;
+    }
+
     setIsCreatingWallet(true);
     setError(null);
 
     try {
-      const wallet = await createResumeWallet();
+      // First try to get existing wallet
+      let wallet = await getResumeWallet();
+      
+      // If no existing wallet, create a new one
+      if (!wallet) {
+        wallet = await createResumeWallet();
+      }
+      
       if (wallet) {
         setResumeWallet(wallet);
-        // Register the wallet
-        registerResumeWallet(wallet);
+        // Only register if not already registered
+        if (!registeredWallet || registeredWallet === "0x0000000000000000000000000000000000000000") {
+          await registerResumeWallet(wallet);
+        }
       } else {
         setError("Failed to create resume wallet");
       }
@@ -110,10 +135,18 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
     }
   };
 
-  const registerResumeWallet = (wallet: string) => {
+  const registerResumeWallet = async (wallet: string) => {
     if (!address) return;
 
+    // Double-check if already registered before attempting registration
+    if (registeredWallet && registeredWallet !== "0x0000000000000000000000000000000000000000") {
+      setResumeWallet(registeredWallet);
+      setIsRegistering(false);
+      return;
+    }
+
     setIsRegistering(true);
+    setError(null);
     try {
       writeRegister({
         address: contractAddress,
@@ -122,15 +155,32 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
         args: [wallet as `0x${string}`],
       });
     } catch (err: any) {
-      setError(err.message || "Failed to register resume wallet");
+      // Handle "already registered" error gracefully
+      if (err?.message?.includes("already registered") || err?.shortMessage?.includes("already registered")) {
+        setError(null);
+        // The wallet is already registered, so we can proceed
+        setResumeWallet(wallet);
+      } else {
+        setError(err.message || "Failed to register resume wallet");
+      }
       setIsRegistering(false);
     }
   };
 
-  const mintSkillPet = () => {
+  const mintSkillPet = async () => {
     if (!resumeWallet) {
       setError("Resume wallet not set");
       return;
+    }
+
+    // Ensure we're on Base Sepolia
+    if (chainId !== baseSepolia.id && switchChainAsync) {
+      try {
+        await switchChainAsync({ chainId: baseSepolia.id });
+      } catch (err: any) {
+        setError("Please switch to Base Sepolia network");
+        return;
+      }
     }
 
     setError(null);
@@ -150,6 +200,7 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
   useEffect(() => {
     if (isRegisterSuccess) {
       setIsRegistering(false);
+      setError(null);
     }
   }, [isRegisterSuccess]);
 
@@ -179,6 +230,32 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
     );
   }
 
+  // Show chain warning
+  if (isConnected && chainId !== baseSepolia.id) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.error} style={{ 
+          background: 'rgba(255, 170, 0, 0.1)', 
+          padding: '1rem', 
+          borderRadius: '8px',
+          border: '1px solid rgba(255, 170, 0, 0.3)',
+        }}>
+          <p>⚠️ Please switch to Base Sepolia network to continue.</p>
+          {switchChainAsync && (
+            <button
+              onClick={() => switchChainAsync({ chainId: baseSepolia.id })}
+              disabled={isSwitchingChain}
+              className={styles.button}
+              style={{ marginTop: '0.5rem' }}
+            >
+              {isSwitchingChain ? "Switching..." : "Switch to Base Sepolia"}
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       <h2>Mint Your SkillPet NFT</h2>
@@ -187,18 +264,27 @@ export default function SkillPetMint({ contractAddress, onMintComplete }: SkillP
         attestations.
       </p>
 
-      {!resumeWallet ? (
+      {!resumeWallet || (resumeWallet && (!registeredWallet || registeredWallet === "0x0000000000000000000000000000000000000000")) ? (
         <div className={styles.walletSetup}>
           <p>First, we need to create your resume wallet (Base Account sub-account)</p>
-          <button
-            onClick={createWallet}
-            disabled={isCreatingWallet || isRegistering || isRegisteringConfirming}
-            className={styles.button}
-          >
-            {isCreatingWallet || isRegistering || isRegisteringConfirming
-              ? "Setting up wallet..."
-              : "Create Resume Wallet"}
-          </button>
+          {registeredWallet && registeredWallet !== "0x0000000000000000000000000000000000000000" ? (
+            <div className={styles.walletInfo}>
+              <p>
+                <strong>Resume Wallet:</strong> {registeredWallet.slice(0, 6)}...{registeredWallet.slice(-4)}
+              </p>
+              <p className={styles.info}>Your resume wallet is already registered!</p>
+            </div>
+          ) : (
+            <button
+              onClick={createWallet}
+              disabled={isCreatingWallet || isRegistering || isRegisteringConfirming}
+              className={styles.button}
+            >
+              {isCreatingWallet || isRegistering || isRegisteringConfirming
+                ? "Setting up wallet..."
+                : "Create Resume Wallet"}
+            </button>
+          )}
         </div>
       ) : (
         <div className={styles.mintSection}>

@@ -284,39 +284,30 @@ export default function Home() {
 
   // Network switching - automatically switch to Base Sepolia when wallet connects
   const switchToBaseSepolia = async () => {
+    if (isSwitchingChain) return;
+    
     try {
       await switchChainAsync({ chainId: baseSepolia.id });
-    } catch (error: any) {
-      // Chain not added to wallet - add it first
-      if (error?.code === 4902 || error?.shortMessage?.includes('4902') || error?.message?.includes('Unrecognized chain')) {
-        setIsAddingChain(true);
-        try {
-          const provider = (window as any).ethereum;
-          if (provider) {
-            await provider.request({
-              method: 'wallet_addEthereumChain',
-              params: [{
-                chainId: `0x${baseSepolia.id.toString(16)}`,
-                chainName: baseSepolia.name,
-                rpcUrls: baseSepolia.rpcUrls.default.http,
-                nativeCurrency: baseSepolia.nativeCurrency,
-                blockExplorerUrls: baseSepolia.blockExplorers?.default ? [baseSepolia.blockExplorers.default.url] : [],
-              }],
-            });
-            // After adding, switch to it
-            await switchChainAsync({ chainId: baseSepolia.id });
-          }
-        } catch (addError) {
-          console.error("Failed to add chain:", addError);
-          setIsAddingChain(false);
-        } finally {
-          setIsAddingChain(false);
-        }
-      } else {
-        console.error("Error switching chain:", error);
-      }
+    } catch (error) {
+      console.error("Error switching chain:", error);
+      // Wagmi v2 usually handles the "add chain" prompt automatically 
+      // if the chain is in the config created in Step 1.
     }
   };
+  
+  // 2. Ensure the auto-switch useEffect is robust
+  useEffect(() => {
+    // Only attempt switch if connected, wrong chain, not currently loading, 
+    // and we actually have a connector active
+    if (
+      isConnected && 
+      chainId !== baseSepolia.id && 
+      !isSwitchingChain && 
+      address // Ensure we have an address before trying to switch
+    ) {
+      switchToBaseSepolia();
+    }
+  }, [isConnected, chainId, isSwitchingChain, address]);
 
   // Automatically switch to Base Sepolia when wallet connects
   useEffect(() => {
@@ -325,6 +316,14 @@ export default function Home() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, chainId, isSwitchingChain, isAddingChain]);
+
+  // Also check chain when user type is selected
+  useEffect(() => {
+    if (userType && isConnected && chainId !== baseSepolia.id && !isSwitchingChain && !isAddingChain) {
+      switchToBaseSepolia();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userType, isConnected, chainId, isSwitchingChain, isAddingChain]);
 
   // Show user type selection if not selected
   if (!userType) {
