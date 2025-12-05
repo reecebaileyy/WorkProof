@@ -7,15 +7,19 @@ import styles from "./CreateAttestation.module.css";
 
 const CREDIBLES_V2_ABI = parseAbi([
   "function isVerifiedIssuer(address issuer) view returns (bool)",
-  "function createAttestationNFT(address recipient, string memory category, string memory title, string memory issuerInfo) external",
   "function getResumeWallet(address) view returns (address)",
 ]);
 
+const ATTESTATION_NFT_ABI = parseAbi([
+  "function createAttestationNFT(address recipient, string memory category, string memory title, string memory issuerInfo) external",
+]);
+
 interface CreateAttestationProps {
-  contractAddress: `0x${string}`;
+  crediblesV2Address: `0x${string}`;
+  attestationNFTAddress: `0x${string}`;
 }
 
-export default function CreateAttestation({ contractAddress }: CreateAttestationProps) {
+export default function CreateAttestation({ crediblesV2Address, attestationNFTAddress }: CreateAttestationProps) {
   const { address, isConnected } = useAccount();
   const [recipient, setRecipient] = useState("");
   const [category, setCategory] = useState("dev");
@@ -24,14 +28,14 @@ export default function CreateAttestation({ contractAddress }: CreateAttestation
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  // Check if user is verified issuer
+  // Check if user is verified issuer (via CrediblesV2)
   const { data: isVerified } = useReadContract({
-    address: contractAddress,
+    address: crediblesV2Address,
     abi: CREDIBLES_V2_ABI,
     functionName: "isVerifiedIssuer",
     args: address ? [address] : undefined,
     query: {
-      enabled: isConnected && !!address,
+      enabled: isConnected && !!address && !!crediblesV2Address,
     },
   });
 
@@ -69,8 +73,8 @@ export default function CreateAttestation({ contractAddress }: CreateAttestation
 
     try {
       writeContract({
-        address: contractAddress,
-        abi: CREDIBLES_V2_ABI,
+        address: attestationNFTAddress,
+        abi: ATTESTATION_NFT_ABI,
         functionName: "createAttestationNFT",
         args: [recipient as `0x${string}`, category, title, issuerInfo || ""],
       });

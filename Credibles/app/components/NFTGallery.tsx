@@ -9,16 +9,20 @@ const CREDIBLES_V2_ABI = parseAbi([
   "function getSkillPetTokenId(address) view returns (uint256)",
   "function skillPetStats(uint256) view returns (uint256 dev, uint256 defi, uint256 gov, uint256 social)",
   "function getSkillPetTraits(uint256) view returns ((string traitType, string value)[])",
-  "function getUserAttestations(address) view returns (uint256[])",
-  "function getAttestationData(uint256) view returns ((address issuer, string category, uint256 timestamp, string issuerInfo, string title))",
   "function getResumeWallet(address) view returns (address)",
 ]);
 
+const ATTESTATION_NFT_ABI = parseAbi([
+  "function getUserAttestations(address) view returns (uint256[])",
+  "function getAttestationData(uint256) view returns ((address issuer, string category, uint256 timestamp, string issuerInfo, string title))",
+]);
+
 interface NFTGalleryProps {
-  contractAddress: `0x${string}`;
+  crediblesV2Address: `0x${string}`;
+  attestationNFTAddress: `0x${string}`;
 }
 
-export default function NFTGallery({ contractAddress }: NFTGalleryProps) {
+export default function NFTGallery({ crediblesV2Address, attestationNFTAddress }: NFTGalleryProps) {
   const { address, isConnected } = useAccount();
   const [resumeWallet, setResumeWallet] = useState<`0x${string}` | null>(null);
   const [skillPetTokenId, setSkillPetTokenId] = useState<bigint | null>(null);
@@ -26,45 +30,45 @@ export default function NFTGallery({ contractAddress }: NFTGalleryProps) {
 
   // Get resume wallet
   const { data: registeredWallet } = useReadContract({
-    address: contractAddress,
+    address: crediblesV2Address,
     abi: CREDIBLES_V2_ABI,
     functionName: "getResumeWallet",
     args: address ? [address] : undefined,
     query: {
-      enabled: isConnected && !!address,
+      enabled: isConnected && !!address && !!crediblesV2Address,
     },
   });
 
   // Get SkillPet token ID
   const { data: skillPetId } = useReadContract({
-    address: contractAddress,
+    address: crediblesV2Address,
     abi: CREDIBLES_V2_ABI,
     functionName: "getSkillPetTokenId",
     args: resumeWallet ? [resumeWallet] : undefined,
     query: {
-      enabled: !!resumeWallet,
+      enabled: !!resumeWallet && !!crediblesV2Address,
     },
   });
 
   // Get SkillPet stats
   const { data: skillPetStats } = useReadContract({
-    address: contractAddress,
+    address: crediblesV2Address,
     abi: CREDIBLES_V2_ABI,
     functionName: "skillPetStats",
     args: skillPetTokenId ? [skillPetTokenId] : undefined,
     query: {
-      enabled: !!skillPetTokenId,
+      enabled: !!skillPetTokenId && !!crediblesV2Address,
     },
   });
 
   // Get attestation token IDs
   const { data: attestationIds } = useReadContract({
-    address: contractAddress,
-    abi: CREDIBLES_V2_ABI,
+    address: attestationNFTAddress,
+    abi: ATTESTATION_NFT_ABI,
     functionName: "getUserAttestations",
     args: resumeWallet ? [resumeWallet] : undefined,
     query: {
-      enabled: !!resumeWallet,
+      enabled: !!resumeWallet && !!attestationNFTAddress && attestationNFTAddress !== "0x0000000000000000000000000000000000000000",
     },
   });
 
@@ -157,7 +161,7 @@ export default function NFTGallery({ contractAddress }: NFTGalleryProps) {
             {attestationTokenIds.map((tokenId) => (
               <AttestationCard
                 key={tokenId.toString()}
-                contractAddress={contractAddress}
+                attestationNFTAddress={attestationNFTAddress}
                 tokenId={tokenId}
               />
             ))}
@@ -171,17 +175,20 @@ export default function NFTGallery({ contractAddress }: NFTGalleryProps) {
 }
 
 function AttestationCard({
-  contractAddress,
+  attestationNFTAddress,
   tokenId,
 }: {
-  contractAddress: `0x${string}`;
+  attestationNFTAddress: `0x${string}`;
   tokenId: bigint;
 }) {
   const { data: attestationData } = useReadContract({
-    address: contractAddress,
-    abi: CREDIBLES_V2_ABI,
+    address: attestationNFTAddress,
+    abi: ATTESTATION_NFT_ABI,
     functionName: "getAttestationData",
     args: [tokenId],
+    query: {
+      enabled: !!attestationNFTAddress && attestationNFTAddress !== "0x0000000000000000000000000000000000000000",
+    },
   });
 
   if (!attestationData) {

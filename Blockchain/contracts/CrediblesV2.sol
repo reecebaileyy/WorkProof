@@ -18,24 +18,11 @@ contract CrediblesV2 is ERC721, Ownable {
         string value;
     }
 
-    // ============ Attestation NFT Struct ============
-    struct AttestationData {
-        address issuer;
-        string category;
-        uint256 timestamp;
-        string issuerInfo;
-        string title; // e.g., "Completed React Course", "Earned DeFi Certification"
-    }
-
     // ============ SkillPet Mappings ============
     mapping(uint256 => Stats) public skillPetStats; // tokenId => stats
     mapping(uint256 => SkillPetTraits[]) public skillPetTraits; // tokenId => traits array
     mapping(address => uint256) public userToSkillPet; // user resume wallet => SkillPet tokenId
     mapping(address => bool) public hasSkillPet; // resume wallet => has minted
-
-    // ============ Attestation NFT Mappings ============
-    mapping(uint256 => AttestationData) public attestationData; // tokenId => attestation data
-    mapping(address => uint256[]) public userAttestations; // resume wallet => array of attestation tokenIds
 
     // ============ Issuer Management ============
     mapping(address => bool) public verifiedIssuers; // issuer address => verified
@@ -49,20 +36,12 @@ contract CrediblesV2 is ERC721, Ownable {
 
     // ============ Token ID Management ============
     uint256 public nextSkillPetId = 1;
-    uint256 public nextAttestationId = 1;
 
     // ============ Events ============
     event SkillPetMinted(address indexed user, address indexed resumeWallet, uint256 indexed tokenId);
     event SkillPetTraitUpdated(uint256 indexed tokenId, string traitType, string value);
     event LevelUp(uint256 indexed tokenId, string category, uint256 newLevel);
     event XPAdded(uint256 indexed tokenId, string category, uint256 amount, address addedBy);
-    event AttestationNFTMinted(
-        address indexed recipient,
-        address indexed issuer,
-        uint256 indexed tokenId,
-        string category,
-        string title
-    );
     event IssuerVerified(address indexed issuer, string domain);
     event IssuerVerificationRequested(address indexed issuer, string domain);
     event ResumeWalletRegistered(address indexed user, address indexed resumeWallet);
@@ -225,69 +204,6 @@ contract CrediblesV2 is ERC721, Ownable {
         return skillPetTraits[tokenId];
     }
 
-    // ============ Attestation NFT Functions ============
-
-    /**
-     * @dev Create and mint attestation NFT (only verified issuers)
-     * Attestation NFTs are static showcase NFTs - they don't add XP
-     */
-    function createAttestationNFT(
-        address recipient,
-        string memory category,
-        string memory title,
-        string memory issuerInfo
-    ) external {
-        require(verifiedIssuers[msg.sender], "Not a verified issuer");
-        require(recipient != address(0), "Invalid recipient");
-        require(bytes(category).length > 0, "Category cannot be empty");
-        require(bytes(title).length > 0, "Title cannot be empty");
-
-        uint256 tokenId = nextAttestationId;
-        nextAttestationId++;
-
-        _mint(recipient, tokenId);
-
-        attestationData[tokenId] = AttestationData({
-            issuer: msg.sender,
-            category: category,
-            timestamp: block.timestamp,
-            issuerInfo: issuerInfo,
-            title: title
-        });
-
-        userAttestations[recipient].push(tokenId);
-
-        emit AttestationNFTMinted(recipient, msg.sender, tokenId, category, title);
-    }
-
-    /**
-     * @dev Get all attestation token IDs for a user
-     */
-    function getUserAttestations(address user) external view returns (uint256[] memory) {
-        return userAttestations[user];
-    }
-
-    /**
-     * @dev Get attestation data for a token ID
-     */
-    function getAttestationData(uint256 tokenId) external view returns (AttestationData memory) {
-        return attestationData[tokenId];
-    }
-
-    /**
-     * @dev Get attestation data fields separately (for easier frontend access)
-     */
-    function getAttestationInfo(uint256 tokenId) external view returns (
-        address issuer,
-        string memory category,
-        uint256 timestamp,
-        string memory issuerInfo,
-        string memory title
-    ) {
-        AttestationData memory data = attestationData[tokenId];
-        return (data.issuer, data.category, data.timestamp, data.issuerInfo, data.title);
-    }
-
     // ============ Internal Functions ============
 
     /**
@@ -336,19 +252,27 @@ contract CrediblesV2 is ERC721, Ownable {
 
     /**
      * @dev Override to make NFTs soulbound (non-transferable)
+     * Allows minting (from == address(0)) and burning (to == address(0))
+     * Prevents all transfers between non-zero addresses
      */
     function _update(
         address to,
         uint256 tokenId,
         address auth
     ) internal override returns (address) {
+        // Get the current owner of the token
+        // For non-existent tokens, _ownerOf returns address(0)
         address from = _ownerOf(tokenId);
 
         // Allow minting (from == address(0)) and burning (to == address(0))
-        require(
-            from == address(0) || to == address(0),
-            "CrediblesV2: Soulbound token - transfers not allowed"
-        );
+        // Prevent transfers between non-zero addresses
+        // This check allows:
+        // 1. Minting: from == address(0) && to != address(0)
+        // 2. Burning: from != address(0) && to == address(0)
+        // 3. Rejects: from != address(0) && to != address(0) (transfers)
+        if (from != address(0) && to != address(0)) {
+            revert("CrediblesV2: Soulbound token - transfers not allowed");
+        }
 
         return super._update(to, tokenId, auth);
     }
