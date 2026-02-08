@@ -452,6 +452,9 @@ npm run lint
 [Add your license here]
 
 ## 👥 Team
+1. Reece Bailey (@reecebaileyy)
+2. Niha (@nihaparkashuni-del)
+3. Christian Huerta
 
 For questions or issues, contact the team or open an issue in the repository.
 
